@@ -8,7 +8,7 @@ from .persistent_base import db, PersistentBase, DataValidationError
 logger = logging.getLogger("flask.app")
 
 ######################################################################
-#  P R O D U C T  M O D E L
+#  I T E M  M O D E L
 ######################################################################
 
 
@@ -28,9 +28,7 @@ class Item(db.Model, PersistentBase):
     price = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return (
-            f"<Item {self.item_id} id=[{self.id}] shopcart[{self.shopcart_id}]>"
-        )
+        return f"<Item {self.item_id} id=[{self.id}] shopcart[{self.shopcart_id}]>"
 
     def __str__(self):
         return f"{self.item_id}: {self.description}, {self.quantity}, {self.price}"
@@ -67,8 +65,7 @@ class Item(db.Model, PersistentBase):
             ) from error
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Item: body of request contained bad or no data "
-                + str(error)
+                "Invalid Item: body of request contained bad or no data " + str(error)
             ) from error
 
         return self

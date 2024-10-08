@@ -17,7 +17,7 @@ DATABASE_URI = os.getenv(
 ######################################################################
 #        P R O D U C T   M O D E L   T E S T   C A S E S
 ######################################################################
-class TestProduct(TestCase):
+class TestItem(TestCase):
     """Item Model Test Cases"""
 
     @classmethod
