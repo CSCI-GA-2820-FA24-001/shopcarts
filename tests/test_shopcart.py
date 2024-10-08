@@ -7,7 +7,7 @@ import os
 from unittest import TestCase
 from unittest.mock import patch
 from wsgi import app
-from service.models import Shopcart, Product, DataValidationError, db
+from service.models import Shopcart, Item, DataValidationError, db
 from tests.factories import ShopcartFactory, ProductFactory
 
 DATABASE_URI = os.getenv(
@@ -40,7 +40,7 @@ class TestShopcart(TestCase):
     def setUp(self):
         """This runs before each test"""
         db.session.query(Shopcart).delete()  # clean up the last tests
-        db.session.query(Product).delete()  # clean up the last tests
+        db.session.query(Item).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -91,7 +91,7 @@ class TestShopcart(TestCase):
         found_shopcart = Shopcart.find(shopcart.id)
         self.assertEqual(found_shopcart.id, shopcart.id)
         self.assertEqual(found_shopcart.name, shopcart.name)
-        self.assertEqual(found_shopcart.products, [])
+        self.assertEqual(found_shopcart.items, [])
 
     def test_update_shopcart(self):
         """It should Update a Shopcart"""
@@ -162,25 +162,25 @@ class TestShopcart(TestCase):
     def test_serialize_a_shopcart(self):
         """It should Serialize a Shopcart"""
         shopcart = Shopcart()
-        product = ProductFactory()
-        shopcart.products.append(product)
+        item = ProductFactory()
+        shopcart.items.append(item)
         serial_shopcart = shopcart.serialize()
         self.assertEqual(serial_shopcart["id"], shopcart.id)
         self.assertEqual(serial_shopcart["name"], shopcart.name)
-        self.assertEqual(len(serial_shopcart["products"]), 1)
+        self.assertEqual(len(serial_shopcart["items"]), 1)
 
-        products = serial_shopcart["products"]
-        self.assertEqual(products[0]["id"], product.id)
-        self.assertEqual(products[0]["shopcart_id"], product.shopcart_id)
-        self.assertEqual(products[0]["product_id"], product.product_id)
-        self.assertEqual(products[0]["description"], product.description)
-        self.assertEqual(products[0]["quantity"], product.quantity)
-        self.assertEqual(products[0]["price"], product.price)
+        items = serial_shopcart["items"]
+        self.assertEqual(items[0]["id"], item.id)
+        self.assertEqual(items[0]["shopcart_id"], item.shopcart_id)
+        self.assertEqual(items[0]["item_id"], item.item_id)
+        self.assertEqual(items[0]["description"], item.description)
+        self.assertEqual(items[0]["quantity"], item.quantity)
+        self.assertEqual(items[0]["price"], item.price)
 
     def test_deserialize_a_shopcart(self):
         """It should Deserialize a Shopcart"""
         shopcart = ShopcartFactory()
-        shopcart.products.append(ProductFactory())
+        shopcart.items.append(ProductFactory())
         shopcart.create()
         serial_shopcart = shopcart.serialize()
         new_shopcart = Shopcart()
@@ -198,11 +198,11 @@ class TestShopcart(TestCase):
         self.assertRaises(DataValidationError, shopcart.deserialize, [])
 
     def test_deserialize_product_key_error(self):
-        """It should not Deserialize a Product with a KeyError"""
-        product = Product()
-        self.assertRaises(DataValidationError, product.deserialize, {})
+        """It should not Deserialize a Item with a KeyError"""
+        item = Item()
+        self.assertRaises(DataValidationError, item.deserialize, {})
 
     def test_deserialize_product_type_error(self):
-        """It should not Deserialize a Product with a TypeError"""
-        product = Product()
-        self.assertRaises(DataValidationError, product.deserialize, [])
+        """It should not Deserialize a Item with a TypeError"""
+        item = Item()
+        self.assertRaises(DataValidationError, item.deserialize, [])

@@ -1,12 +1,12 @@
 """
-Test cases for Product Model
+Test cases for Item Model
 """
 
 import logging
 import os
 from unittest import TestCase
 from wsgi import app
-from service.models import Shopcart, Product, DataValidationError, db
+from service.models import Shopcart, Item, DataValidationError, db
 from tests.factories import ShopcartFactory, ProductFactory
 
 DATABASE_URI = os.getenv(
@@ -18,7 +18,7 @@ DATABASE_URI = os.getenv(
 #        P R O D U C T   M O D E L   T E S T   C A S E S
 ######################################################################
 class TestProduct(TestCase):
-    """Product Model Test Cases"""
+    """Item Model Test Cases"""
 
     @classmethod
     def setUpClass(cls):
@@ -37,7 +37,7 @@ class TestProduct(TestCase):
     def setUp(self):
         """This runs before each test"""
         db.session.query(Shopcart).delete()  # clean up the last tests
-        db.session.query(Product).delete()  # clean up the last tests
+        db.session.query(Item).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -49,15 +49,15 @@ class TestProduct(TestCase):
     ######################################################################
 
     def test_add_shopcart_product(self):
-        """It should Create a shopcart with a product and add it to the database"""
+        """It should Create a shopcart with a item and add it to the database"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopcartFactory()
 
-        # product = ProductFactory(shopcart=shopcart)
-        product = ProductFactory()
+        # item = ProductFactory(shopcart=shopcart)
+        item = ProductFactory()
 
-        shopcart.products.append(product)
+        shopcart.items.append(item)
         shopcart.create()
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(shopcart.id)
@@ -65,14 +65,14 @@ class TestProduct(TestCase):
         self.assertEqual(len(shopcarts), 1)
 
         new_shopcart = Shopcart.find(shopcart.id)
-        self.assertEqual(new_shopcart.products[0].product_id, product.product_id)
+        self.assertEqual(new_shopcart.items[0].item_id, item.item_id)
 
         # product2 = ProductFactory(shopcart=shopcart)
         product2 = ProductFactory()
 
-        shopcart.products.append(product2)
+        shopcart.items.append(product2)
         shopcart.update()
 
         new_shopcart = Shopcart.find(shopcart.id)
-        self.assertEqual(len(new_shopcart.products), 2)
-        self.assertEqual(new_shopcart.products[1].product_id, product2.product_id)
+        self.assertEqual(len(new_shopcart.items), 2)
+        self.assertEqual(new_shopcart.items[1].item_id, product2.item_id)

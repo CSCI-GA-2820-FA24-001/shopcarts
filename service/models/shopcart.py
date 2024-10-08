@@ -4,7 +4,7 @@ Persistent Base class for database CRUD functions
 
 import logging
 from .persistent_base import db, PersistentBase, DataValidationError
-from .product import Product
+from .item import Item
 
 logger = logging.getLogger("flask.app")
 
@@ -21,7 +21,7 @@ class Shopcart(db.Model, PersistentBase):
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
-    products = db.relationship("Product", backref="product", passive_deletes=True)
+    items = db.relationship("Item", backref="item", passive_deletes=True)
 
     def __repr__(self):
         return f"<Shopcart {self.name} id=[{self.id}]>"
@@ -31,10 +31,10 @@ class Shopcart(db.Model, PersistentBase):
         shopcart = {
             "id": self.id,
             "name": self.name,
-            "products": [],
+            "items": [],
         }
-        for product in self.products:
-            shopcart["products"].append(product.serialize())
+        for item in self.items:
+            shopcart["items"].append(item.serialize())
         return shopcart
 
     def deserialize(self, data):
@@ -47,13 +47,13 @@ class Shopcart(db.Model, PersistentBase):
         try:
             self.name = data["name"]
 
-            # handle inner list of products
-            product_list = data.get("products")
+            # handle inner list of items
+            product_list = data.get("items")
 
             for json_product in product_list:
-                product = Product()
-                product.deserialize(json_product)
-                self.products.append(product)
+                item = Item()
+                item.deserialize(json_product)
+                self.items.append(item)
 
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error

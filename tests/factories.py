@@ -4,7 +4,7 @@ Test Factory to make fake objects for testing
 
 from factory import Factory, Sequence, Faker, post_generation, SubFactory
 from factory.fuzzy import FuzzyInteger, FuzzyText
-from service.models import Shopcart, Product
+from service.models import Shopcart, Item
 
 
 class ShopcartFactory(Factory):
@@ -20,15 +20,15 @@ class ShopcartFactory(Factory):
     name = Faker("first_name")
 
     @post_generation
-    def products(
+    def items(
         self, create, extracted, **kwargs
     ):  # pylint: disable=method-hidden, unused-argument
-        """Creates the products list"""
+        """Creates the items list"""
         if not create:
             return
 
         if extracted:
-            self.products = extracted
+            self.items = extracted
 
 
 class ProductFactory(Factory):
@@ -38,11 +38,11 @@ class ProductFactory(Factory):
     class Meta:
         """Persistent class"""
 
-        model = Product
+        model = Item
 
     id = Sequence(lambda n: n)
     shopcart_id = None
-    product_id = FuzzyInteger(1, 20)
+    item_id = FuzzyInteger(1, 20)
     description = FuzzyText(length=12)
     quantity = FuzzyInteger(1, 30)
     price = FuzzyInteger(100, 1000)
