@@ -23,7 +23,7 @@ class ShopcartFactory(Factory):
     def products(
         self, create, extracted, **kwargs
     ):  # pylint: disable=method-hidden, unused-argument
-        """Creates the addresses list"""
+        """Creates the products list"""
         if not create:
             return
 

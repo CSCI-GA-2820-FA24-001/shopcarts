@@ -5,7 +5,6 @@ Test cases for Product Model
 import logging
 import os
 from unittest import TestCase
-from unittest.mock import patch
 from wsgi import app
 from service.models import Shopcart, Product, DataValidationError, db
 from tests.factories import ShopcartFactory, ProductFactory
@@ -54,8 +53,10 @@ class TestProduct(TestCase):
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopcartFactory()
+
         # product = ProductFactory(shopcart=shopcart)
         product = ProductFactory()
+
         shopcart.products.append(product)
         shopcart.create()
         # Assert that it was assigned an id and shows up in the database
@@ -68,6 +69,7 @@ class TestProduct(TestCase):
 
         # product2 = ProductFactory(shopcart=shopcart)
         product2 = ProductFactory()
+
         shopcart.products.append(product2)
         shopcart.update()
 
