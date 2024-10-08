@@ -2,19 +2,48 @@
 Test Factory to make fake objects for testing
 """
 
-import factory
-from service.models import YourResourceModel
+from factory import Factory, Sequence, Faker, post_generation, SubFactory
+from factory.fuzzy import FuzzyInteger, FuzzyText
+from service.models import Shopcart, Product
 
 
-class YourResourceModelFactory(factory.Factory):
+class ShopcartFactory(Factory):
     """Creates fake pets that you don't have to feed"""
 
-    class Meta:  # pylint: disable=too-few-public-methods
+    # pylint: disable=too-few-public-methods
+    class Meta:
         """Maps factory to data model"""
 
-        model = YourResourceModel
+        model = Shopcart
 
-    id = factory.Sequence(lambda n: n)
-    name = factory.Faker("first_name")
+    id = Sequence(lambda n: n)
+    name = Faker("first_name")
 
-    # Todo: Add your other attributes here...
+    @post_generation
+    def products(
+        self, create, extracted, **kwargs
+    ):  # pylint: disable=method-hidden, unused-argument
+        """Creates the addresses list"""
+        if not create:
+            return
+
+        if extracted:
+            self.products = extracted
+
+
+class ProductFactory(Factory):
+    """Creates fake Addresses"""
+
+    # pylint: disable=too-few-public-methods
+    class Meta:
+        """Persistent class"""
+
+        model = Product
+
+    id = Sequence(lambda n: n)
+    shopcart_id = None
+    product_id = FuzzyInteger(1, 20)
+    description = FuzzyText(length=12)
+    quantity = FuzzyInteger(1, 30)
+    price = FuzzyInteger(100, 1000)
+    # shopcart = SubFactory(ShopcartFactory)
