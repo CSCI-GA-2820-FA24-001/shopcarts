@@ -48,7 +48,9 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
-# Todo: Place your REST API code here ...
+######################################################################
+# LIST ALL SHOPCARTS
+######################################################################
 @app.route("/shopcarts", methods=["GET"])
 def list_shopcarts():
     """Returns all of the Shopcarts"""
