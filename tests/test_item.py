@@ -7,7 +7,7 @@ import os
 from unittest import TestCase
 from wsgi import app
 from service.models import Shopcart, Item, DataValidationError, db
-from tests.factories import ShopcartFactory, ProductFactory
+from tests.factories import ShopcartFactory, ItemFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/postgres"
@@ -53,9 +53,7 @@ class TestItem(TestCase):
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopcartFactory()
-
-        # item = ProductFactory(shopcart=shopcart)
-        item = ProductFactory()
+        item = ItemFactory(shopcart=shopcart)
 
         shopcart.items.append(item)
         shopcart.create()
@@ -67,9 +65,7 @@ class TestItem(TestCase):
         new_shopcart = Shopcart.find(shopcart.id)
         self.assertEqual(new_shopcart.items[0].item_id, item.item_id)
 
-        # product2 = ProductFactory(shopcart=shopcart)
-        product2 = ProductFactory()
-
+        product2 = ItemFactory(shopcart=shopcart)
         shopcart.items.append(product2)
         shopcart.update()
 
