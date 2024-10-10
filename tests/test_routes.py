@@ -70,11 +70,11 @@ class TestShopcartService(TestCase):
     #  H E L P E R   M E T H O D S
     ######################################################################
 
-    def _create_shopcarts(self, count):
-        """Factory method to create accounts in bulk"""
+    def _create_shopcarts(self, count, name=None) -> list:
+        """Factory method to create shopcarts in bulk"""
         shopcarts = []
-        for _ in range(count):
-            shopcart = ShopcartFactory()
+        for i in range(count):
+            shopcart = ShopcartFactory(name=name if name else f"shopcart{i}")
             resp = self.client.post(BASE_URL, json=shopcart.serialize())
             self.assertEqual(
                 resp.status_code,
@@ -119,3 +119,39 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_shopcart = resp.get_json()
         self.assertEqual(new_shopcart["name"], shopcart.name, "Names does not match")
+
+    def test_list_shopcarts(self):
+        """It should Get a list of Shopcarts and filter by name"""
+        # Create 5 shopcarts with default names
+        self._create_shopcarts(5)
+        
+        self._create_shopcarts(1, name="special_shopcart")
+        
+        # Test getting all shopcarts
+        resp = self.client.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 6)
+        
+        # Test getting shopcarts by name
+        resp = self.client.get(BASE_URL + "?name=special_shopcart")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["name"], "special_shopcart")
+
+    def test_get_shopcart(self):
+        """It should Get a single Shopcart"""
+        test_shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.get(f"/shopcarts/{test_shopcart.id}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], test_shopcart.name)
+
+    def test_get_shopcart_not_found(self):
+        """It should not Get a Shopcart that's not found"""
+        resp = self.client.get("/shopcarts/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = resp.get_json()
+        logging.debug("resp data = %s", data)
+        self.assertIn("was not found", data["message"])
