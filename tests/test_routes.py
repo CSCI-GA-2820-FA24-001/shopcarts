@@ -97,3 +97,25 @@ class TestShopcartService(TestCase):
         data = resp.get_json()
         self.assertEqual(data["name"], "Shopcarts REST API Service")
         self.assertEqual(data["version"], "1.0")
+
+    def test_create_shopcart(self):
+        """It should Create a new Shopcart"""
+        shopcart = ShopcartFactory()
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        # Check the data is correct
+        new_shopcart = resp.get_json()
+        self.assertEqual(new_shopcart["name"], shopcart.name, "Names does not match")
+
+        # Check that the location header was correct by getting it
+        resp = self.client.get(location, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_shopcart = resp.get_json()
+        self.assertEqual(new_shopcart["name"], shopcart.name, "Names does not match")
