@@ -47,6 +47,30 @@ def index():
 
 
 ######################################################################
+# CREATE A NEW ACCOUNT
+######################################################################
+@app.route("/shopcarts", methods=["POST"])
+def create_shopcarts():
+    """
+    Creates a Shopcart
+    This endpoint will create a Shopcart based the data in the body that is posted
+    """
+    app.logger.info("Request to create a Shopcart")
+    check_content_type("application/json")
+
+    # Create the shopcart
+    shopcart = Shopcart()
+    shopcart.deserialize(request.get_json())
+    shopcart.create()
+
+    # Create a message to return
+    message = shopcart.serialize()
+    # location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
+
+    return jsonify(message), status.HTTP_201_CREATED  # , {"Location": location_url}
+
+
+######################################################################
 # LIST ALL SHOPCARTS
 ######################################################################
 @app.route("/shopcarts", methods=["GET"])
@@ -66,3 +90,26 @@ def list_shopcarts():
     results = [shopcart.serialize() for shopcart in shopcarts]
 
     return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+
+def check_content_type(content_type):
+    """Checks that the media type is correct"""
+    if "Content-Type" not in request.headers:
+        app.logger.error("No Content-Type specified.")
+        abort(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            f"Content-Type must be {content_type}",
+        )
+
+    if request.headers["Content-Type"] == content_type:
+        return
+
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
+    )
