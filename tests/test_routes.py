@@ -25,10 +25,13 @@ from unittest import TestCase
 from wsgi import app
 from service.common import status
 from service.models import db, Shopcart, Item
+from tests.factories import ShopcartFactory, ItemFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
+
+BASE_URL = "/shopcarts"
 
 
 ######################################################################
@@ -64,6 +67,26 @@ class TestShopcartService(TestCase):
         db.session.remove()
 
     ######################################################################
+    #  H E L P E R   M E T H O D S
+    ######################################################################
+
+    def _create_shopcarts(self, count):
+        """Factory method to create accounts in bulk"""
+        shopcarts = []
+        for _ in range(count):
+            shopcart = ShopcartFactory()
+            resp = self.client.post(BASE_URL, json=shopcart.serialize())
+            self.assertEqual(
+                resp.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test Shopcart",
+            )
+            new_shopcart = resp.get_json()
+            shopcart.id = new_shopcart["id"]
+            shopcarts.append(shopcart)
+        return shopcarts
+
+    ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
 
@@ -74,4 +97,3 @@ class TestShopcartService(TestCase):
         data = resp.get_json()
         self.assertEqual(data["name"], "Shopcarts REST API Service")
         self.assertEqual(data["version"], "1.0")
-

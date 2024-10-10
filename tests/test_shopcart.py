@@ -8,7 +8,7 @@ from unittest import TestCase
 from unittest.mock import patch
 from wsgi import app
 from service.models import Shopcart, Item, DataValidationError, db
-from tests.factories import ShopcartFactory, ProductFactory
+from tests.factories import ShopcartFactory, ItemFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/postgres"
@@ -162,7 +162,7 @@ class TestShopcart(TestCase):
     def test_serialize_a_shopcart(self):
         """It should Serialize a Shopcart"""
         shopcart = Shopcart()
-        item = ProductFactory()
+        item = ItemFactory()
         shopcart.items.append(item)
         serial_shopcart = shopcart.serialize()
         self.assertEqual(serial_shopcart["id"], shopcart.id)
@@ -180,7 +180,7 @@ class TestShopcart(TestCase):
     def test_deserialize_a_shopcart(self):
         """It should Deserialize a Shopcart"""
         shopcart = ShopcartFactory()
-        shopcart.items.append(ProductFactory())
+        shopcart.items.append(ItemFactory())
         shopcart.create()
         serial_shopcart = shopcart.serialize()
         new_shopcart = Shopcart()

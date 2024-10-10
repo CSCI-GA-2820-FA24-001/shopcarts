@@ -31,8 +31,8 @@ class ShopcartFactory(Factory):
             self.items = extracted
 
 
-class ProductFactory(Factory):
-    """Creates fake Addresses"""
+class ItemFactory(Factory):
+    """Creates fake Items"""
 
     # pylint: disable=too-few-public-methods
     class Meta:
@@ -46,4 +46,4 @@ class ProductFactory(Factory):
     description = FuzzyText(length=12)
     quantity = FuzzyInteger(1, 30)
     price = FuzzyInteger(100, 1000)
-    # shopcart = SubFactory(ShopcartFactory)
+    shopcart = SubFactory(ShopcartFactory)
