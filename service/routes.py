@@ -65,9 +65,9 @@ def create_shopcarts():
 
     # Create a message to return
     message = shopcart.serialize()
-    # location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
+    location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
 
-    return jsonify(message), status.HTTP_201_CREATED  # , {"Location": location_url}
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
@@ -90,6 +90,25 @@ def list_shopcarts():
     results = [shopcart.serialize() for shopcart in shopcarts]
 
     return jsonify(results), status.HTTP_200_OK
+
+
+######################################################################
+# READ A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
+def get_shopcarts(shopcart_id):
+    """
+    Retrieve a single Shopcart
+
+    This endpoint will return a Shopcart based on it's id
+    """
+    app.logger.info("Request to Retrieve a shopcart with id: %s", shopcart_id)
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(status.HTTP_404_NOT_FOUND, f"Shopcart with id {shopcart_id} was not found")
+
+    app.logger.info("Returning shopcart: %s", shopcart.name)
+    return jsonify(shopcart.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
