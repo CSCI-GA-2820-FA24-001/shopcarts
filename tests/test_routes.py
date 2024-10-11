@@ -124,15 +124,15 @@ class TestShopcartService(TestCase):
         """It should Get a list of Shopcarts and filter by name"""
         # Create 5 shopcarts with default names
         self._create_shopcarts(5)
-        
+
         self._create_shopcarts(1, name="special_shopcart")
-        
+
         # Test getting all shopcarts
         resp = self.client.get(BASE_URL)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 6)
-        
+
         # Test getting shopcarts by name
         resp = self.client.get(BASE_URL + "?name=special_shopcart")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -155,3 +155,19 @@ class TestShopcartService(TestCase):
         data = resp.get_json()
         logging.debug("resp data = %s", data)
         self.assertIn("was not found", data["message"])
+
+    def test_update_shopcart(self):
+        """It should Update an existing shopcarts"""
+        # create an shopcarts to update
+        test_shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=test_shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the pet
+        new_shopcart = resp.get_json()
+        new_shopcart["name"] = "Happy-Happy Joy-Joy"
+        new_shopcart_id = new_shopcart["id"]
+        resp = self.client.put(f"{BASE_URL}/{new_shopcart_id}", json=new_shopcart)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_shopcart = resp.get_json()
+        self.assertEqual(updated_shopcart["name"], "Happy-Happy Joy-Joy")
