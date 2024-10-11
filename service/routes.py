@@ -39,6 +39,16 @@ def index():
             name="Shopcarts REST API Service",
             version="1.0",
             paths={
+                "create_shopcarts": url_for("create_shopcarts", _external=True),
+                "read_shopcarts": url_for(
+                    "get_shopcarts", shopcart_id=1, _external=True
+                ),
+                "update_shopcarts": url_for(
+                    "update_shopcarts", shopcart_id=1, _external=True
+                ),
+                "delete_shopcarts": url_for(
+                    "delete_shopcarts", shopcart_id=1, _external=True
+                ),
                 "list_shopcarts": url_for("list_shopcarts", _external=True),
             },
         ),
@@ -162,6 +172,7 @@ def delete_shopcarts(shopcart_id):
 
     app.logger.info("Shopcart with ID: %d deleted", shopcart_id)
     return {}, status.HTTP_204_NO_CONTENT
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
