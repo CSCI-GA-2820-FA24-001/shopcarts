@@ -112,6 +112,27 @@ def get_shopcarts(shopcart_id):
 
 
 ######################################################################
+# DELETE A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["DELETE"])
+def delete_shopcarts(shopcart_id):
+    """
+    Delete a Shopcart
+
+    This endpoint will delete a Shopcart based the id specified in the path
+    """
+    app.logger.info("Request to Delete a shopcart with id: %s", shopcart_id)
+
+    # Delete the shopcart if it exists
+    shopcart = Shopcart.find(shopcart_id)
+    if shopcart:
+        app.logger.info("Shopcart with ID: %d found", shopcart_id)
+        shopcart.delete()
+
+    app.logger.info("Shopcart with ID: %d deleted", shopcart_id)
+    return {}, status.HTTP_204_NO_CONTENT
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
