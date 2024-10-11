@@ -98,6 +98,9 @@ class TestShopcartService(TestCase):
         self.assertEqual(data["name"], "Shopcarts REST API Service")
         self.assertEqual(data["version"], "1.0")
 
+    # ----------------------------------------------------------
+    # TEST CREATE
+    # ----------------------------------------------------------
     def test_create_shopcart(self):
         """It should Create a new Shopcart"""
         shopcart = ShopcartFactory()
@@ -120,6 +123,9 @@ class TestShopcartService(TestCase):
         new_shopcart = resp.get_json()
         self.assertEqual(new_shopcart["name"], shopcart.name, "Names does not match")
 
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
     def test_list_shopcarts(self):
         """It should Get a list of Shopcarts and filter by name"""
         # Create 5 shopcarts with default names
@@ -140,6 +146,9 @@ class TestShopcartService(TestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["name"], "special_shopcart")
 
+    # ----------------------------------------------------------
+    # TEST READ
+    # ----------------------------------------------------------
     def test_get_shopcart(self):
         """It should Get a single Shopcart"""
         test_shopcart = self._create_shopcarts(1)[0]
@@ -156,6 +165,9 @@ class TestShopcartService(TestCase):
         logging.debug("resp data = %s", data)
         self.assertIn("was not found", data["message"])
 
+    # ----------------------------------------------------------
+    # TEST READ
+    # ----------------------------------------------------------
     def test_update_shopcart(self):
         """It should Update an existing shopcarts"""
         # create a shopcart to update
@@ -177,3 +189,22 @@ class TestShopcartService(TestCase):
         update_data = {"name": "some_name"}
         resp = self.client.put(f"{BASE_URL}/0", json=update_data)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        
+    # ----------------------------------------------------------
+    # TEST DELETE
+    # ----------------------------------------------------------
+    def test_delete_shopcart(self):
+        """It should delete a Shopcart"""
+        test_shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.delete(f"{BASE_URL}/{test_shopcart.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.client.get(f"{BASE_URL}/{test_shopcart.id}")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_non_exist_shopcart(self):
+        """It should Delete a Shopcart even if it does not exist"""
+        resp = self.client.delete(f"{BASE_URL}/0")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
