@@ -158,16 +158,22 @@ class TestShopcartService(TestCase):
 
     def test_update_shopcart(self):
         """It should Update an existing shopcarts"""
-        # create an shopcarts to update
+        # create a shopcart to update
         test_shopcart = ShopcartFactory()
         resp = self.client.post(BASE_URL, json=test_shopcart.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        # update the pet
+        # update the shopcart
         new_shopcart = resp.get_json()
-        new_shopcart["name"] = "Happy-Happy Joy-Joy"
+        new_shopcart["name"] = "special_shopcart"
         new_shopcart_id = new_shopcart["id"]
         resp = self.client.put(f"{BASE_URL}/{new_shopcart_id}", json=new_shopcart)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_shopcart = resp.get_json()
-        self.assertEqual(updated_shopcart["name"], "Happy-Happy Joy-Joy")
+        self.assertEqual(updated_shopcart["name"], "special_shopcart")
+
+    def test_update_nonexistent_shopcart(self):
+        """It should return 404 when updating a shopcart that does not exist"""
+        update_data = {"name": "some_name"}
+        resp = self.client.put(f"{BASE_URL}/0", json=update_data)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
