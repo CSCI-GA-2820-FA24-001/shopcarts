@@ -73,6 +73,7 @@ class TestShopcartService(TestCase):
     def _create_shopcarts(self, count, name=None) -> list:
         """Factory method to create shopcarts in bulk"""
         shopcarts = []
+
         for i in range(count):
             shopcart = ShopcartFactory(name=name if name else f"shopcart{i}")
             resp = self.client.post(BASE_URL, json=shopcart.serialize())
@@ -84,10 +85,11 @@ class TestShopcartService(TestCase):
             new_shopcart = resp.get_json()
             shopcart.id = new_shopcart["id"]
             shopcarts.append(shopcart)
+
         return shopcarts
 
     ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E
+    #  T E S T   C A S E S
     ######################################################################
 
     def test_index(self):
@@ -97,6 +99,10 @@ class TestShopcartService(TestCase):
         data = resp.get_json()
         self.assertEqual(data["name"], "Shopcarts REST API Service")
         self.assertEqual(data["version"], "1.0")
+
+    ######################################################################
+    #  S H O P C A R T   T E S T   C A S E S
+    ######################################################################
 
     # ----------------------------------------------------------
     # TEST CREATE
@@ -124,29 +130,6 @@ class TestShopcartService(TestCase):
         self.assertEqual(new_shopcart["name"], shopcart.name, "Names does not match")
 
     # ----------------------------------------------------------
-    # TEST LIST
-    # ----------------------------------------------------------
-    def test_list_shopcarts(self):
-        """It should Get a list of Shopcarts and filter by name"""
-        # Create 5 shopcarts with default names
-        self._create_shopcarts(5)
-
-        self._create_shopcarts(1, name="special_shopcart")
-
-        # Test getting all shopcarts
-        resp = self.client.get(BASE_URL)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(len(data), 6)
-
-        # Test getting shopcarts by name
-        resp = self.client.get(BASE_URL + "?name=special_shopcart")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["name"], "special_shopcart")
-
-    # ----------------------------------------------------------
     # TEST READ
     # ----------------------------------------------------------
     def test_get_shopcart(self):
@@ -166,7 +149,7 @@ class TestShopcartService(TestCase):
         self.assertIn("was not found", data["message"])
 
     # ----------------------------------------------------------
-    # TEST READ
+    # TEST UPDATE
     # ----------------------------------------------------------
     def test_update_shopcart(self):
         """It should Update an existing shopcarts"""
@@ -189,7 +172,7 @@ class TestShopcartService(TestCase):
         update_data = {"name": "some_name"}
         resp = self.client.put(f"{BASE_URL}/0", json=update_data)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        
+
     # ----------------------------------------------------------
     # TEST DELETE
     # ----------------------------------------------------------
@@ -208,3 +191,80 @@ class TestShopcartService(TestCase):
         resp = self.client.delete(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
+    def test_list_shopcarts(self):
+        """It should Get a list of Shopcarts and filter by name"""
+        # Create 5 shopcarts with default names
+        self._create_shopcarts(5)
+
+        self._create_shopcarts(1, name="special_shopcart")
+
+        # Test getting all shopcarts
+        resp = self.client.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 6)
+
+        # Test getting shopcarts by name
+        resp = self.client.get(BASE_URL + "?name=special_shopcart")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["name"], "special_shopcart")
+
+    ######################################################################
+    #  I T E M   T E S T   C A S E S
+    ######################################################################
+
+    # ----------------------------------------------------------
+    # TEST CREATE
+    # ----------------------------------------------------------
+
+    def test_add_item(self):
+        """It should create a new item and add to a shopcart"""
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["shopcart_id"], shopcart.id)
+        self.assertEqual(data["item_id"], item.item_id)
+        self.assertEqual(data["description"], item.description)
+        self.assertEqual(data["quantity"], item.quantity)
+        self.assertEqual(data["price"], item.price)
+
+        # Check that the location header was correct by getting it
+        resp = self.client.get(location, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_item = resp.get_json()
+        self.assertEqual(new_item["item_id"], item.item_id, "item name does not match")
+
+    # ----------------------------------------------------------
+    # TEST READ
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # TEST UPDATE
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # TEST DELETE
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
