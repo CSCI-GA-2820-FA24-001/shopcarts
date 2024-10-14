@@ -216,7 +216,32 @@ def create_items(shopcart_id):
         "get_items", shopcart_id=shopcart.id, item_id=item.id, _external=True
     )
 
-    return jsonify(message), status.HTTP_200_OK, {"Location": location_url}
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+
+
+######################################################################
+# RETRIEVE AN ITEM FROM SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["GET"])
+def get_items(shopcart_id, item_id):
+    """
+    Get an Item
+
+    This endpoint returns just an item
+    """
+    app.logger.info(
+        "Request to retrieve Item %s for Account id: %s", (item_id, shopcart_id)
+    )
+
+    # See if the item exists and abort if it doesn't
+    item = Item.find(item_id)
+    if not item:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Account with id '{item_id}' could not be found.",
+        )
+
+    return jsonify(item.serialize()), status.HTTP_200_OK
 
 
 ######################################################################

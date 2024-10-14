@@ -241,21 +241,54 @@ class TestShopcartService(TestCase):
 
         data = resp.get_json()
         logging.debug(data)
-        self.assertEqual(data["shopcart_id"], shopcart.id)
-        self.assertEqual(data["item_id"], item.item_id)
+        self.assertEqual(str(data["shopcart_id"]), str(shopcart.id))
+        self.assertEqual(str(data["item_id"]), str(item.item_id))
         self.assertEqual(data["description"], item.description)
-        self.assertEqual(data["quantity"], item.quantity)
-        self.assertEqual(data["price"], item.price)
+        self.assertEqual(str(data["quantity"]), str(item.quantity))
+        self.assertEqual(str(data["price"]), str(item.price))
 
         # Check that the location header was correct by getting it
         resp = self.client.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_item = resp.get_json()
-        self.assertEqual(new_item["item_id"], item.item_id, "item name does not match")
+        # Converting both to string for comparison
+        self.assertEqual(
+            str(new_item["item_id"]), str(item.item_id), "item name does not match"
+        )
 
     # ----------------------------------------------------------
     # TEST READ
     # ----------------------------------------------------------
+    def test_read_an_item(self):
+        """It should Read an item from an shopcart"""
+        # create a known item
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        logging.debug(data)
+        item_id = data["id"]
+
+        # retrieve it back
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart.id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(str(data["shopcart_id"]), str(shopcart.id))
+        self.assertEqual(str(data["item_id"]), str(item.item_id))
+        self.assertEqual(data["description"], item.description)
+        self.assertEqual(str(data["quantity"]), str(item.quantity))
+        self.assertEqual(str(data["price"]), str(item.price))
 
     # ----------------------------------------------------------
     # TEST UPDATE
