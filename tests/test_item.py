@@ -48,6 +48,35 @@ class TestItem(TestCase):
     #  T E S T   C A S E S
     ######################################################################
 
+    def test_serialize_a_item(self):
+        """It should serialize a Item"""
+        item = ItemFactory()
+        serial_item = item.serialize()
+        self.assertEqual(serial_item["id"], item.id)
+        self.assertEqual(serial_item["shopcart_id"], item.shopcart_id)
+        self.assertEqual(serial_item["item_id"], item.item_id)
+        self.assertEqual(serial_item["description"], item.description)
+        self.assertEqual(serial_item["quantity"], item.quantity)
+        self.assertEqual(serial_item["price"], item.price)
+
+    def test_deserialize_a_item(self):
+        """It should deserialize a Item"""
+        item = ItemFactory()
+        item.create()
+
+        new_item = Item()
+        new_item = item.deserialize(item.serialize())
+        self.assertEqual(new_item.id, item.id)
+        self.assertEqual(new_item.shopcart_id, item.shopcart_id)
+        self.assertEqual(new_item.description, item.description)
+        self.assertEqual(new_item.description, item.description)
+        self.assertEqual(new_item.quantity, item.quantity)
+        self.assertEqual(new_item.price, item.price)
+
+    # ----------------------------------------------------------
+    # TEST CREATE
+    # ----------------------------------------------------------
+
     def test_add_shopcart_product(self):
         """It should Create a shopcart with a item and add it to the database"""
         shopcarts = Shopcart.all()
@@ -72,3 +101,19 @@ class TestItem(TestCase):
         new_shopcart = Shopcart.find(shopcart.id)
         self.assertEqual(len(new_shopcart.items), 2)
         self.assertEqual(new_shopcart.items[1].item_id, product2.item_id)
+
+    # ----------------------------------------------------------
+    # TEST READ
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # TEST UPDATE
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # TEST DELETE
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
