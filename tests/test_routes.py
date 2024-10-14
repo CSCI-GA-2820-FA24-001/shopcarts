@@ -301,3 +301,59 @@ class TestShopcartService(TestCase):
     # ----------------------------------------------------------
     # TEST LIST
     # ----------------------------------------------------------
+
+    def test_create_shopcart_bad_request(self):
+        """It should return 400 Bad Request when the request data is invalid"""
+        # Create a shopcart payload without the required 'name' field
+        invalid_shopcart_data = {"description": "A shopcart without a name"}
+
+        # Send POST request to create a shopcart with invalid data
+        resp = self.client.post(BASE_URL, json=invalid_shopcart_data)
+
+        # Assert that the response status code is 400
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Assert that the response contains expected error information
+        error_response = resp.get_json()
+        self.assertEqual(error_response["status"], status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(error_response["error"], "Bad Request")
+        self.assertIn("message", error_response)
+        # Optionally check if the error message contains specific text
+        self.assertIn("invalid", error_response["message"].lower())
+
+    def test_method_not_allowed(self):
+        """It should return 405 Method Not Allowed for unsupported HTTP methods"""
+        # Attempt to POST to an endpoint that only supports GET
+        resp = self.client.post("/", content_type="application/json")
+
+        # Assert that the response status code is 405
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        # Assert that the response contains expected error information
+        error_response = resp.get_json()
+        self.assertEqual(error_response["status"], status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(error_response["error"], "Method not Allowed")
+        self.assertIn("message", error_response)
+        # Optionally check if the error message contains specific text related to method not allowed
+        self.assertIn("not allowed", error_response["message"].lower())
+
+    def test_unsupported_media_type(self):
+        """It should return 415 Unsupported Media Type for unsupported Content-Type"""
+        # Send a request with an unsupported Content-Type
+        headers = {"Content-Type": "text/plain"}
+        data = "This is not JSON"
+
+        resp = self.client.post(BASE_URL, data=data, headers=headers)
+
+        # Assert that the response status code is 415
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+        # Assert that the response contains expected error information
+        error_response = resp.get_json()
+        self.assertEqual(
+            error_response["status"], status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+        )
+        self.assertEqual(error_response["error"], "Unsupported media type")
+        self.assertIn("message", error_response)
+        # Optionally check if the error message contains specific text related to unsupported media type
+        self.assertIn("unsupported", error_response["message"].lower())

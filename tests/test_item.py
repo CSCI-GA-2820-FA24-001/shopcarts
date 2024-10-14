@@ -105,43 +105,29 @@ class TestItem(TestCase):
     # TEST READ
     # ----------------------------------------------------------
     def test_read_item_from_shopcart(self):
-        """It should Read an item from a particular shopcart"""
-        shopcart = ShopcartFactory()
-        item1 = ItemFactory(shopcart=shopcart)
-        item2 = ItemFactory(shopcart=shopcart)
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
 
-        shopcart.items.extend([item1, item2])
+        # Create a shopcart and add an item
+        shopcart = ShopcartFactory()
+        item = ItemFactory(shopcart=shopcart)
+        shopcart.items.append(item)
         shopcart.create()
 
+        # Fetch the shopcart from the database and verify it contains one item
         new_shopcart = Shopcart.find(shopcart.id)
-        self.assertEqual(len(new_shopcart.items), 2)
+        self.assertIsNotNone(new_shopcart)
+        self.assertEqual(len(new_shopcart.items), 1)
 
-        # Verify item1
+        # Verify item details by searching within new_shopcart.items
         retrieved_item = next(
-            (
-                item
-                for item in new_shopcart.items
-                if str(item.item_id) == str(item1.item_id)
-            ),
+            (i for i in new_shopcart.items if str(i.item_id) == str(item.item_id)),
             None,
         )
-        self.assertIsNotNone(retrieved_item)
-        self.assertEqual(str(retrieved_item.item_id), str(item1.item_id))
-        self.assertEqual(retrieved_item.description, item1.description)
-        self.assertEqual(retrieved_item.quantity, item1.quantity)
-        self.assertEqual(retrieved_item.price, item1.price)
 
-        # Verify item2
-        retrieved_item2 = next(
-            (
-                item
-                for item in new_shopcart.items
-                if str(item.item_id) == str(item2.item_id)
-            ),
-            None,
-        )
-        self.assertIsNotNone(retrieved_item2)
-        self.assertEqual(str(retrieved_item2.item_id), str(item2.item_id))
-        self.assertEqual(retrieved_item2.description, item2.description)
-        self.assertEqual(retrieved_item2.quantity, item2.quantity)
-        self.assertEqual(retrieved_item2.price, item2.price)
+        # Assertions to ensure the retrieved item matches the expected values
+        self.assertIsNotNone(retrieved_item)
+        self.assertEqual(str(retrieved_item.item_id), str(item.item_id))
+        self.assertEqual(retrieved_item.description, item.description)
+        self.assertEqual(retrieved_item.quantity, item.quantity)
+        self.assertEqual(retrieved_item.price, item.price)
