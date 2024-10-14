@@ -189,7 +189,7 @@ class TestShopcartService(TestCase):
         update_data = {"name": "some_name"}
         resp = self.client.put(f"{BASE_URL}/0", json=update_data)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        
+
     # ----------------------------------------------------------
     # TEST DELETE
     # ----------------------------------------------------------
@@ -208,3 +208,42 @@ class TestShopcartService(TestCase):
         resp = self.client.delete(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
+
+    # ----------------------------------------------------------
+    # TEST LIST ALL ITEMS IN SHOPCART
+    # ----------------------------------------------------------
+    def test_list_items_in_shopcart(self):
+        """It should List all items in a particular Shopcart"""
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_shopcart = resp.get_json()
+
+        # Add multiple items to the shopcart
+        item1 = ItemFactory(shopcart_id=new_shopcart["id"])
+        item2 = ItemFactory(shopcart_id=new_shopcart["id"])
+
+        # Add item1
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item1.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Add item2
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item2.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Retrieve all items in the shopcart
+        resp = self.client.get(f"{BASE_URL}/{new_shopcart['id']}/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # Verify the response contains both items
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+
+        # Ensure the items returned are the ones we added
+        self.assertEqual(data[0]["item_id"], item1.item_id)
+        self.assertEqual(data[1]["item_id"], item2.item_id)

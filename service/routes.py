@@ -175,6 +175,33 @@ def delete_shopcarts(shopcart_id):
 
 
 ######################################################################
+# LIST ALL ITEMS IN A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
+def list_items_in_shopcart(shopcart_id):
+    """
+    List all items in a Shopcart
+
+    This endpoint will return all items in the shopcart with the given id.
+    """
+    app.logger.info("Request to list items in Shopcart %s", shopcart_id)
+
+    # Find the shopcart by id
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' was not found.",
+        )
+
+    # Serialize all items in the shopcart
+    items = [item.serialize() for item in shopcart.items]
+
+    app.logger.info("Returning %d items from Shopcart %s", len(items), shopcart_id)
+    return jsonify(items), status.HTTP_200_OK
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
