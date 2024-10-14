@@ -76,9 +76,8 @@ class TestItem(TestCase):
     # ----------------------------------------------------------
     # TEST CREATE
     # ----------------------------------------------------------
-
     def test_add_shopcart_product(self):
-        """It should Create a shopcart with a item and add it to the database"""
+        """It should Create a shopcart with a item and add it to the serial_itembase"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopcartFactory()
@@ -86,7 +85,7 @@ class TestItem(TestCase):
 
         shopcart.items.append(item)
         shopcart.create()
-        # Assert that it was assigned an id and shows up in the database
+        # Assert that it was assigned an id and shows up in the serial_itembase
         self.assertIsNotNone(shopcart.id)
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 1)
@@ -105,15 +104,44 @@ class TestItem(TestCase):
     # ----------------------------------------------------------
     # TEST READ
     # ----------------------------------------------------------
+    def test_read_item_from_shopcart(self):
+        """It should Read an item from a particular shopcart"""
+        shopcart = ShopcartFactory()
+        item1 = ItemFactory(shopcart=shopcart)
+        item2 = ItemFactory(shopcart=shopcart)
 
-    # ----------------------------------------------------------
-    # TEST UPDATE
-    # ----------------------------------------------------------
+        shopcart.items.extend([item1, item2])
+        shopcart.create()
 
-    # ----------------------------------------------------------
-    # TEST DELETE
-    # ----------------------------------------------------------
+        new_shopcart = Shopcart.find(shopcart.id)
+        self.assertEqual(len(new_shopcart.items), 2)
 
-    # ----------------------------------------------------------
-    # TEST LIST
-    # ----------------------------------------------------------
+        # Verify item1
+        retrieved_item = next(
+            (
+                item
+                for item in new_shopcart.items
+                if str(item.item_id) == str(item1.item_id)
+            ),
+            None,
+        )
+        self.assertIsNotNone(retrieved_item)
+        self.assertEqual(str(retrieved_item.item_id), str(item1.item_id))
+        self.assertEqual(retrieved_item.description, item1.description)
+        self.assertEqual(retrieved_item.quantity, item1.quantity)
+        self.assertEqual(retrieved_item.price, item1.price)
+
+        # Verify item2
+        retrieved_item2 = next(
+            (
+                item
+                for item in new_shopcart.items
+                if str(item.item_id) == str(item2.item_id)
+            ),
+            None,
+        )
+        self.assertIsNotNone(retrieved_item2)
+        self.assertEqual(str(retrieved_item2.item_id), str(item2.item_id))
+        self.assertEqual(retrieved_item2.description, item2.description)
+        self.assertEqual(retrieved_item2.quantity, item2.quantity)
+        self.assertEqual(retrieved_item2.price, item2.price)
