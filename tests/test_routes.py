@@ -73,6 +73,7 @@ class TestShopcartService(TestCase):
     def _create_shopcarts(self, count, name=None) -> list:
         """Factory method to create shopcarts in bulk"""
         shopcarts = []
+
         for i in range(count):
             shopcart = ShopcartFactory(name=name if name else f"shopcart{i}")
             resp = self.client.post(BASE_URL, json=shopcart.serialize())
@@ -84,10 +85,11 @@ class TestShopcartService(TestCase):
             new_shopcart = resp.get_json()
             shopcart.id = new_shopcart["id"]
             shopcarts.append(shopcart)
+
         return shopcarts
 
     ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E
+    #  T E S T   C A S E S
     ######################################################################
 
     def test_index(self):
@@ -97,6 +99,10 @@ class TestShopcartService(TestCase):
         data = resp.get_json()
         self.assertEqual(data["name"], "Shopcarts REST API Service")
         self.assertEqual(data["version"], "1.0")
+
+    ######################################################################
+    #  S H O P C A R T   T E S T   C A S E S
+    ######################################################################
 
     # ----------------------------------------------------------
     # TEST CREATE
@@ -124,29 +130,6 @@ class TestShopcartService(TestCase):
         self.assertEqual(new_shopcart["name"], shopcart.name, "Names does not match")
 
     # ----------------------------------------------------------
-    # TEST LIST
-    # ----------------------------------------------------------
-    def test_list_shopcarts(self):
-        """It should Get a list of Shopcarts and filter by name"""
-        # Create 5 shopcarts with default names
-        self._create_shopcarts(5)
-
-        self._create_shopcarts(1, name="special_shopcart")
-
-        # Test getting all shopcarts
-        resp = self.client.get(BASE_URL)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(len(data), 6)
-
-        # Test getting shopcarts by name
-        resp = self.client.get(BASE_URL + "?name=special_shopcart")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["name"], "special_shopcart")
-
-    # ----------------------------------------------------------
     # TEST READ
     # ----------------------------------------------------------
     def test_get_shopcart(self):
@@ -166,7 +149,7 @@ class TestShopcartService(TestCase):
         self.assertIn("was not found", data["message"])
 
     # ----------------------------------------------------------
-    # TEST READ
+    # TEST UPDATE
     # ----------------------------------------------------------
     def test_update_shopcart(self):
         """It should Update an existing shopcarts"""
@@ -210,52 +193,6 @@ class TestShopcartService(TestCase):
         self.assertEqual(len(resp.data), 0)
 
     # ----------------------------------------------------------
-    # TEST DELETE ITEM FROM SHOPCART
-    # ----------------------------------------------------------
-    def test_delete_item_from_shopcart(self):
-        """It should delete an Item from a Shopcart"""
-        # Create a shopcart
-        shopcart = ShopcartFactory()
-        resp = self.client.post(BASE_URL, json=shopcart.serialize())
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_shopcart = resp.get_json()
-
-        # Add an item to the shopcart and explicitly pass shopcart_id
-        item = ItemFactory(shopcart_id=new_shopcart["id"])
-        resp = self.client.post(
-            f"{BASE_URL}/{new_shopcart['id']}/items", json=item.serialize()
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_item = resp.get_json()
-
-        # Delete the item from the shopcart
-        resp = self.client.delete(
-            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-
-        # Verify the item is no longer in the shopcart
-        resp = self.client.get(
-            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_delete_item_not_found(self):
-        """It should return 404 when trying to delete an item that does not exist"""
-        # Create a shopcart
-        shopcart = ShopcartFactory()
-        resp = self.client.post(BASE_URL, json=shopcart.serialize())
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_shopcart = resp.get_json()
-
-        # Try deleting a non-existing item
-        resp = self.client.delete(
-            f"{BASE_URL}/{new_shopcart['id']}/items/0"
-        )  # ID 0 doesn't exist
-        self.assertEqual(
-            resp.status_code, status.HTTP_404_NOT_FOUND
-        )  # Expect 404 for non-existent item
-
     # TEST LIST
     # ----------------------------------------------------------
     def test_list_shopcarts(self):

@@ -50,6 +50,7 @@ def index():
                     "delete_shopcarts", shopcart_id=1, _external=True
                 ),
                 "list_shopcarts": url_for("list_shopcarts", _external=True),
+                "create_items": url_for("create_items", shopcart_id=1, _external=True),
             },
         ),
         status.HTTP_200_OK,
@@ -241,41 +242,6 @@ def get_items(shopcart_id, item_id):
         )
 
     return jsonify(item.serialize()), status.HTTP_200_OK
-
-
-######################################################################
-# DELETE AN ITEM FROM A SHOPCART
-######################################################################
-@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["DELETE"])
-def delete_item_from_shopcart(shopcart_id, item_id):
-    """
-    Delete an Item from a Shopcart
-
-    This endpoint will delete an Item based on the item_id from the specified shopcart
-    """
-    app.logger.info("Request to delete Item %s from Shopcart %s", item_id, shopcart_id)
-
-    # Find the shopcart by shopcart_id
-    shopcart = Shopcart.find(shopcart_id)
-    if not shopcart:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Shopcart with id '{shopcart_id}' was not found.",
-        )
-
-    # Find the item by item_id within the shopcart
-    item = Item.query.filter_by(id=item_id, shopcart_id=shopcart_id).first()
-    if not item:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Item with id '{item_id}' in Shopcart '{shopcart_id}' was not found.",
-        )
-
-    # Delete the item
-    item.delete()
-
-    app.logger.info("Item with id %s deleted from Shopcart %s", item_id, shopcart_id)
-    return {}, status.HTTP_204_NO_CONTENT
 
 
 ######################################################################
