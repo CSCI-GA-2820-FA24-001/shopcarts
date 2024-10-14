@@ -131,3 +131,17 @@ class TestItem(TestCase):
         self.assertEqual(retrieved_item.description, item.description)
         self.assertEqual(retrieved_item.quantity, item.quantity)
         self.assertEqual(retrieved_item.price, item.price)
+
+    # ----------------------------------------------------------
+    # TEST DELETE
+    # ----------------------------------------------------------
+    def test_delete_item(self):
+        """It should Delete an Item from the database"""
+        item = ItemFactory()
+        item.create()
+        self.assertIsNotNone(item.id)
+
+        # Delete the item and check if it has been removed
+        item.delete()
+        items = Item.all()
+        self.assertEqual(len(items), 0)
