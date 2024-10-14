@@ -72,3 +72,14 @@ class TestItem(TestCase):
         new_shopcart = Shopcart.find(shopcart.id)
         self.assertEqual(len(new_shopcart.items), 2)
         self.assertEqual(new_shopcart.items[1].item_id, product2.item_id)
+
+    def test_delete_item(self):
+        """It should Delete an Item from the database"""
+        item = ItemFactory()
+        item.create()
+        self.assertIsNotNone(item.id)
+
+        # Delete the item and check if it has been removed
+        item.delete()
+        items = Item.all()
+        self.assertEqual(len(items), 0)
