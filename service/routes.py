@@ -50,6 +50,8 @@ def index():
                     "delete_shopcarts", shopcart_id=1, _external=True
                 ),
                 "list_shopcarts": url_for("list_shopcarts", _external=True),
+                "update_shopcart_item": url_for("update_item_quantity", uid=1, pid=1, _external=True),  # PUT route for updating item quantity
+                "get_shopcart_item": url_for("get_item_quantity", uid=1, pid=1, _external=True),  # GET route for retrieving item quantity
             },
         ),
         status.HTTP_200_OK,
