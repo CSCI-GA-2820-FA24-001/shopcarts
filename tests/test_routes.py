@@ -297,6 +297,49 @@ class TestShopcartService(TestCase):
     # ----------------------------------------------------------
     # TEST DELETE
     # ----------------------------------------------------------
+    def test_delete_item_from_shopcart(self):
+        """It should delete an Item from a Shopcart"""
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_shopcart = resp.get_json()
+
+        # Add an item to the shopcart and explicitly pass shopcart_id
+        item = ItemFactory(shopcart_id=new_shopcart["id"])
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_item = resp.get_json()
+
+        # Delete the item from the shopcart
+        resp = self.client.delete(
+            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Verify the item is no longer in the shopcart
+        resp = self.client.get(
+            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_item_not_found(self):
+        """It should return 404 when trying to delete an item that does not exist"""
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_shopcart = resp.get_json()
+
+        # Try deleting a non-existing item
+        resp = self.client.delete(
+            f"{BASE_URL}/{new_shopcart['id']}/items/0"
+        )  # ID 0 doesn't exist
+        self.assertEqual(
+            resp.status_code, status.HTTP_404_NOT_FOUND
+        )  # Expect 404 for non-existent item
 
     # ----------------------------------------------------------
     # TEST LIST
