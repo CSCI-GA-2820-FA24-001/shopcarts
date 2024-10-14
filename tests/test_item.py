@@ -145,3 +145,28 @@ class TestItem(TestCase):
         item.delete()
         items = Item.all()
         self.assertEqual(len(items), 0)
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
+    def test_list_all_items_in_shopcart(self):
+        """It should List all items in a Shopcart"""
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+
+        # Create a shopcart and add two items
+        shopcart = ShopcartFactory()
+        item1 = ItemFactory(shopcart=shopcart)
+        item2 = ItemFactory(shopcart=shopcart)
+        shopcart.items.append(item1)
+        shopcart.items.append(item2)
+        shopcart.create()
+
+        # Retrieve all items in the shopcart
+        shopcart = Shopcart.find(shopcart.id)
+        items = shopcart.items
+
+        # Verify the response contains both items
+        self.assertEqual(len(items), 2)
+        self.assertEqual(items[0].item_id, item1.item_id)
+        self.assertEqual(items[1].item_id, item2.item_id)
