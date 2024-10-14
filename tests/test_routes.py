@@ -301,6 +301,41 @@ class TestShopcartService(TestCase):
     # ----------------------------------------------------------
     # TEST LIST
     # ----------------------------------------------------------
+    def test_list_items_in_shopcart(self):
+        """It should List all items in a particular Shopcart"""
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_shopcart = resp.get_json()
+
+        # Add multiple items to the shopcart
+        item1 = ItemFactory(shopcart_id=new_shopcart["id"])
+        item2 = ItemFactory(shopcart_id=new_shopcart["id"])
+
+        # Add item1
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item1.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Add item2
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item2.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Retrieve all items in the shopcart
+        resp = self.client.get(f"{BASE_URL}/{new_shopcart['id']}/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # Verify the response contains both items
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+
+        # Convert item_id from response to int and ensure the items returned are the ones we added
+        self.assertEqual(int(data[0]["item_id"]), item1.item_id)
+        self.assertEqual(int(data[1]["item_id"]), item2.item_id)
 
     def test_create_shopcart_bad_request(self):
         """It should return 400 Bad Request when the request data is invalid"""
