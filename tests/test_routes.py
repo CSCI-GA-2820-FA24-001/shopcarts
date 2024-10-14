@@ -255,3 +255,112 @@ class TestShopcartService(TestCase):
         self.assertEqual(
             resp.status_code, status.HTTP_404_NOT_FOUND
         )  # Expect 404 for non-existent item
+
+    # TEST LIST
+    # ----------------------------------------------------------
+    def test_list_shopcarts(self):
+        """It should Get a list of Shopcarts and filter by name"""
+        # Create 5 shopcarts with default names
+        self._create_shopcarts(5)
+
+        self._create_shopcarts(1, name="special_shopcart")
+
+        # Test getting all shopcarts
+        resp = self.client.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 6)
+
+        # Test getting shopcarts by name
+        resp = self.client.get(BASE_URL + "?name=special_shopcart")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["name"], "special_shopcart")
+
+    ######################################################################
+    #  I T E M   T E S T   C A S E S
+    ######################################################################
+
+    # ----------------------------------------------------------
+    # TEST CREATE
+    # ----------------------------------------------------------
+
+    def test_add_item(self):
+        """It should create a new item and add to a shopcart"""
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(str(data["shopcart_id"]), str(shopcart.id))
+        self.assertEqual(str(data["item_id"]), str(item.item_id))
+        self.assertEqual(data["description"], item.description)
+        self.assertEqual(str(data["quantity"]), str(item.quantity))
+        self.assertEqual(str(data["price"]), str(item.price))
+
+        # Check that the location header was correct by getting it
+        resp = self.client.get(location, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_item = resp.get_json()
+        # Converting both to string for comparison
+        self.assertEqual(
+            str(new_item["item_id"]), str(item.item_id), "item name does not match"
+        )
+
+    # ----------------------------------------------------------
+    # TEST READ
+    # ----------------------------------------------------------
+    def test_read_an_item(self):
+        """It should Read an item from an shopcart"""
+        # create a known item
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        logging.debug(data)
+        item_id = data["id"]
+
+        # retrieve it back
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart.id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(str(data["shopcart_id"]), str(shopcart.id))
+        self.assertEqual(str(data["item_id"]), str(item.item_id))
+        self.assertEqual(data["description"], item.description)
+        self.assertEqual(str(data["quantity"]), str(item.quantity))
+        self.assertEqual(str(data["price"]), str(item.price))
+
+    # ----------------------------------------------------------
+    # TEST UPDATE
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # TEST DELETE
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------

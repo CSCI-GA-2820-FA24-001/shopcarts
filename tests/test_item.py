@@ -73,6 +73,9 @@ class TestItem(TestCase):
         self.assertEqual(len(new_shopcart.items), 2)
         self.assertEqual(new_shopcart.items[1].item_id, product2.item_id)
 
+    # ----------------------------------------------------------
+    # TEST READ
+    # ----------------------------------------------------------
     def test_delete_item(self):
         """It should Delete an Item from the database"""
         item = ItemFactory()
@@ -83,3 +86,48 @@ class TestItem(TestCase):
         item.delete()
         items = Item.all()
         self.assertEqual(len(items), 0)
+
+    # ----------------------------------------------------------
+    # TEST READ
+    # ----------------------------------------------------------
+    def test_read_item_from_shopcart(self):
+        """It should Read an item from a particular shopcart"""
+        shopcart = ShopcartFactory()
+        item1 = ItemFactory(shopcart=shopcart)
+        item2 = ItemFactory(shopcart=shopcart)
+
+        shopcart.items.extend([item1, item2])
+        shopcart.create()
+
+        new_shopcart = Shopcart.find(shopcart.id)
+        self.assertEqual(len(new_shopcart.items), 2)
+
+        # Verify item1
+        retrieved_item = next(
+            (
+                item
+                for item in new_shopcart.items
+                if str(item.item_id) == str(item1.item_id)
+            ),
+            None,
+        )
+        self.assertIsNotNone(retrieved_item)
+        self.assertEqual(str(retrieved_item.item_id), str(item1.item_id))
+        self.assertEqual(retrieved_item.description, item1.description)
+        self.assertEqual(retrieved_item.quantity, item1.quantity)
+        self.assertEqual(retrieved_item.price, item1.price)
+
+        # Verify item2
+        retrieved_item2 = next(
+            (
+                item
+                for item in new_shopcart.items
+                if str(item.item_id) == str(item2.item_id)
+            ),
+            None,
+        )
+        self.assertIsNotNone(retrieved_item2)
+        self.assertEqual(str(retrieved_item2.item_id), str(item2.item_id))
+        self.assertEqual(retrieved_item2.description, item2.description)
+        self.assertEqual(retrieved_item2.quantity, item2.quantity)
+        self.assertEqual(retrieved_item2.price, item2.price)
