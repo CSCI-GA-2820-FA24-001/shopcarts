@@ -58,6 +58,219 @@ tests/                     - test cases package
 └── test_routes.py         - test suite for service routes
 ```
 
+## API Endpoints
+
+Here’s a list of available API endpoints with their descriptions:
+
+| HTTP Method | Endpoint                             | Description                                         |
+|-------------|--------------------------------------|-----------------------------------------------------|
+| GET         | /                                    | Return some JSON about the service                  |
+| GET         | /shopcarts                           | List all shopcarts                                  |
+| POST        | /shopcarts                           | Create a new shopcart                               |
+| GET         | /shopcarts/{id}                      | Read a shopcart by its ID                           |
+| PUT         | /shopcarts/{id}                      | Update a shopcart by its ID                         |
+| DELETE      | /shopcarts/{id}                      | Delete a shopcart by its ID                         |
+| GET         | /shopcarts/{id}/items                | List all items in a shopcart                        |
+| POST        | /shopcarts/{id}/items                | Create a new item in a shopcart                     |
+| GET         | /shopcarts/{id}/items/{item_id}      | Read an item from a shopcart                        |
+| PUT         | /shopcarts/{id}/items/{item_id}      | Update an item in a shopcart                        |
+| DELETE      | /shopcarts/{id}/items/{item_id}      | Delete an item from a shopcart                      |
+
+
+### 1. **GET /**
+
+**Description**: This endpoint returns metadata about the service.
+
+**Response**:
+- `200 OK` with a JSON object containing the name, version, and available endpoints.
+
+---
+
+### 2. **GET /shopcarts**
+
+**Description**: Retrieve a list of all shopcarts.
+
+**Query Parameters** (optional):
+- `name`: Filter shopcarts by name.
+
+**Response**:
+- `200 OK` with a JSON array of shopcarts.
+
+---
+
+### 3. **POST /shopcarts**
+
+**Description**: Create a new shopcart.
+
+**Request Body**:
+```json
+{
+  "name": "John's Shopcart"
+}
+```
+
+**Response**:
+- `201 Created` with the serialized shopcart in the response body.
+- `Location` header containing the URL to retrieve the created shopcart.
+
+---
+
+### 4. **GET /shopcarts/{shopcart_id}**
+
+**Description**: Retrieve a specific shopcart by its ID.
+
+**URL Parameters**:
+- `shopcart_id` (integer): The ID of the shopcart to retrieve.
+
+**Response**:
+- `200 OK` with the serialized shopcart data.
+- `404 Not Found` if the shopcart is not found.
+
+---
+
+### 5. **PUT /shopcarts/{shopcart_id}**
+
+**Description**: Update a specific shopcart.
+
+**URL Parameters**:
+- `shopcart_id` (integer): The ID of the shopcart to update.
+
+**Request Body**:
+```json
+{
+  "name": "Updated Shopcart Name"
+}
+```
+
+**Response**:
+- `200 OK` with the updated shopcart data.
+- `404 Not Found` if the shopcart is not found.
+
+---
+
+### 6. **DELETE /shopcarts/{shopcart_id}**
+
+**Description**: Delete a specific shopcart by its ID.
+
+**URL Parameters**:
+- `shopcart_id` (integer): The ID of the shopcart to delete.
+
+**Response**:
+- `204 No Content` if successful.
+- `404 Not Found` if the shopcart is not found.
+
+---
+
+### 7. **POST /shopcarts/{shopcart_id}/items**
+
+**Description**: Add a new item to a specific shopcart.
+
+**URL Parameters**:
+- `shopcart_id` (integer): The ID of the shopcart to which the item will be added.
+
+**Request Body**:
+```json
+{
+  "item_id": "A123",
+  "description": "Laptop",
+  "quantity": 2,
+  "price": 1000
+}
+```
+
+**Response**:
+- `201 Created` with the serialized item data in the response body.
+- `Location` header containing the URL to retrieve the created item.
+- `404 Not Found` if the shopcart is not found.
+
+---
+
+### 8. **GET /shopcarts/{shopcart_id}/items**
+
+**Description**: Retrieve all items in a specific shopcart.
+
+**URL Parameters**:
+- `shopcart_id` (integer): The ID of the shopcart for which to list the items.
+
+**Response**:
+- `200 OK` with a JSON array of items in the shopcart.
+- `404 Not Found` if the shopcart is not found.
+
+---
+
+### 9. **GET /shopcarts/{shopcart_id}/items/{item_id}**
+
+**Description**: Retrieve a specific item in a shopcart by its ID.
+
+**URL Parameters**:
+- `shopcart_id` (integer): The ID of the shopcart containing the item.
+- `item_id` (integer): The ID of the item to retrieve.
+
+**Response**:
+- `200 OK` with the serialized item data.
+- `404 Not Found` if the shopcart or the item is not found.
+
+---
+
+### 10. **PUT /shopcarts/{shopcart_id}/items/{item_id}**
+
+**Description**: Update a specific item in a shopcart.
+
+**URL Parameters**:
+- `shopcart_id` (integer): The ID of the shopcart containing the item.
+- `item_id` (integer): The ID of the item to update.
+
+**Request Body**:
+```json
+{
+  "item_id": "A123",
+  "description": "Updated Laptop",
+  "quantity": 1,
+  "price": 1200
+}
+```
+
+**Response**:
+- `200 OK` with the updated item data.
+- `404 Not Found` if the shopcart or the item is not found.
+
+---
+
+### 11. **DELETE /shopcarts/{shopcart_id}/items/{item_id}**
+
+**Description**: Delete a specific item from a shopcart.
+
+**URL Parameters**:
+- `shopcart_id` (integer): The ID of the shopcart containing the item.
+- `item_id` (integer): The ID of the item to delete.
+
+**Response**:
+- `204 No Content` if successful.
+- `404 Not Found` if the shopcart or the item is not found.
+
+---
+
+
+## Running Tests
+
+To run the tests, use the following command:
+
+```bash
+make test
+```
+
+This will run all the test cases located in the `tests` folder, including unit tests for models and API route tests, using `pytest`. This will have a force term of at least 95% coverage.
+
+## Running Linting
+
+To check your code for style and linting issues, use the following command:
+
+```bash
+make lint
+```
+
+This will run `flake8` and other configured linters to ensure your code follows Python style guidelines and best practices.
+
 ## License
 
 Copyright (c) 2016, 2024 [John Rofrano](https://www.linkedin.com/in/JohnRofrano/). All rights reserved.
