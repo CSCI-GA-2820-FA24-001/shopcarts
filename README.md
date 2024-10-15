@@ -62,19 +62,19 @@ tests/                     - test cases package
 
 Here’s a list of available API endpoints with their descriptions:
 
-| HTTP Method | Endpoint                             | Description                                         |
-|-------------|--------------------------------------|-----------------------------------------------------|
-| GET         | /                                    | Return some JSON about the service                  |
-| GET         | /shopcarts                           | List all shopcarts                                  |
-| POST        | /shopcarts                           | Create a new shopcart                               |
-| GET         | /shopcarts/{id}                      | Read a shopcart by its ID                           |
-| PUT         | /shopcarts/{id}                      | Update a shopcart by its ID                         |
-| DELETE      | /shopcarts/{id}                      | Delete a shopcart by its ID                         |
-| GET         | /shopcarts/{id}/items                | List all items in a shopcart                        |
-| POST        | /shopcarts/{id}/items                | Create a new item in a shopcart                     |
-| GET         | /shopcarts/{id}/items/{item_id}      | Read an item from a shopcart                        |
-| PUT         | /shopcarts/{id}/items/{item_id}      | Update an item in a shopcart                        |
-| DELETE      | /shopcarts/{id}/items/{item_id}      | Delete an item from a shopcart                      |
+| HTTP Method | Endpoint                                      | Description                                         |
+|-------------|-----------------------------------------------|-----------------------------------------------------|
+| GET         | /                                             | Return some JSON about the service                  |
+| GET         | /shopcarts                                    | List all shopcarts                                  |
+| POST        | /shopcarts                                    | Create a new shopcart                               |
+| GET         | /shopcarts/{shopcart_id}                      | Read a shopcart by its ID                           |
+| PUT         | /shopcarts/{shopcart_id}                      | Update a shopcart by its ID                         |
+| DELETE      | /shopcarts/{shopcart_id}                      | Delete a shopcart by its ID                         |
+| GET         | /shopcarts/{shopcart_id}/items                | List all items in a shopcart                        |
+| POST        | /shopcarts/{shopcart_id}/items                | Create a new item to a shopcart                     |
+| GET         | /shopcarts/{shopcart_id}/items/{item_id}      | Read an item from a shopcart                        |
+| PUT         | /shopcarts/{shopcart_id}/items/{item_id}      | Update an item in a shopcart                        |
+| DELETE      | /shopcarts/{shopcart_id}/items/{item_id}      | Delete an item from a shopcart                      |
 
 
 ### 1. **GET /**
