@@ -57,13 +57,16 @@ def index():
                     "get_items", shopcart_id=1, item_id=1, _external=True
                 ),
                 "update_shopcart_items": url_for(
-                    "create_items", shopcart_id=1, _external=True
+                    "update_items", shopcart_id=1, item_id=1, _external=True
                 ),
                 "delete_shopcart_items": url_for(
-                    "create_items", shopcart_id=1, _external=True
+                    "delete_item_from_shopcart",
+                    shopcart_id=1,
+                    item_id=1,
+                    _external=True,
                 ),
                 "list_shopcart_items": url_for(
-                    "create_items", shopcart_id=1, _external=True
+                    "list_items_in_shopcart", shopcart_id=1, _external=True
                 ),
             },
         ),
