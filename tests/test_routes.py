@@ -352,7 +352,7 @@ class TestShopcartService(TestCase):
         item_id = data["id"]
         item_desc = data["description"]
         item_price = data["price"]
-        data["item_id"] = "ABC123"
+        data["item_id"] = "ABC1234"
         data["quantity"] = 56789
 
         # send the update back
@@ -373,7 +373,7 @@ class TestShopcartService(TestCase):
         data = resp.get_json()
         logging.debug(data)
         self.assertEqual(data["id"], item_id)
-        self.assertEqual(data["item_id"], "ABC123")
+        self.assertEqual(data["item_id"], "ABC1234")
         self.assertEqual(data["description"], item_desc)
         self.assertEqual(data["quantity"], 56789)
         self.assertEqual(data["price"], item_price)
