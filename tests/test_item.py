@@ -49,18 +49,11 @@ class TestItem(TestCase):
     ######################################################################
     def test_repr(self):
         """Test the __repr__ method"""
-        # Create a sample item with necessary attributes
-        item = Item(
-            item_id="item123",
-            id=1,
-            shopcart_id=456,
-            description="Sample item description",
-            quantity=10,
-            price=2050,
-        )
+        # Create a sample item
+        item = ItemFactory()
 
         # Expected __repr__ output
-        expected_repr = "<Item item123 id=[1] shopcart[456]>"
+        expected_repr = f"<Item {item.item_id} id=[{item.id}] shopcart[None]>"
 
         # Assert that the __repr__ returns the correct value
         self.assertEqual(repr(item), expected_repr)
@@ -68,17 +61,12 @@ class TestItem(TestCase):
     def test_str(self):
         """Test the __str__ method"""
         # Create a sample item with necessary attributes
-        item = Item(
-            item_id="item123",
-            id=1,
-            shopcart_id=456,
-            description="Sample item description",
-            quantity=10,
-            price=2050,
-        )
+        item = ItemFactory()
 
         # Expected __str__ output
-        expected_str = "item123: Sample item description, 10, 2050"
+        expected_str = (
+            f"{item.item_id}: {item.description}, {item.quantity}, {item.price}"
+        )
 
         # Assert that the __str__ returns the correct value
         self.assertEqual(str(item), expected_str)
@@ -112,7 +100,7 @@ class TestItem(TestCase):
     # TEST CREATE
     # ----------------------------------------------------------
     def test_add_shopcart_product(self):
-        """It should Create a shopcart with a item and add it to the serial_itembase"""
+        """It should Create a shopcart with a item and add it to the database"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopcartFactory()
@@ -140,6 +128,7 @@ class TestItem(TestCase):
     # TEST READ
     # ----------------------------------------------------------
     def test_read_item_from_shopcart(self):
+        """It should Read items in a shopcart"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
 

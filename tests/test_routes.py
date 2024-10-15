@@ -215,6 +215,28 @@ class TestShopcartService(TestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["name"], "special_shopcart")
 
+    # ----------------------------------------------------------
+    # TEST BAD ROUTES
+    # ----------------------------------------------------------
+
+    def test_bad_request(self):
+        """It should not Create when sending the wrong data"""
+        resp = self.client.post(BASE_URL, json={"name": "not enough data"})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unsupported_media_type(self):
+        """It should not Create when sending wrong media type"""
+        shopcart = ShopcartFactory()
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="test/html"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_method_not_allowed(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.put(BASE_URL, json={"not": "today"})
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     ######################################################################
     #  I T E M   T E S T   C A S E S
     ######################################################################
@@ -256,6 +278,25 @@ class TestShopcartService(TestCase):
             str(new_item["item_id"]), str(item.item_id), "item name does not match"
         )
 
+    def test_add_item_not_found(self):
+        """It should return 404 when trying to add to a shopcart does not exist"""
+        # Create a shopcart and delete it instantly
+        shopcart = self._create_shopcarts(1)[0]
+
+        resp = self.client.delete(f"{BASE_URL}/{shopcart.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+
+        # Add an item to the shopcart should fail
+        item = ItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     # ----------------------------------------------------------
     # TEST READ
     # ----------------------------------------------------------
@@ -294,162 +335,48 @@ class TestShopcartService(TestCase):
     # TEST UPDATE
     # ----------------------------------------------------------
 
-    def test_update_item_quantity(self):
-        """It should update the quantity of an existing item in a shopcart"""
-        # Create a shopcart
-        shopcart = ShopcartFactory()
-        resp = self.client.post(BASE_URL, json=shopcart.serialize())
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_shopcart = resp.get_json()
-
-        # Add an item to the shopcart
-        item = ItemFactory(shopcart_id=new_shopcart["id"])
+    def test_update_item(self):
+        """It should Update an Item in a shopcart"""
+        # create a item
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
         resp = self.client.post(
-            f"{BASE_URL}/{new_shopcart['id']}/items", json=item.serialize()
+            f"{BASE_URL}/{shopcart.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_item = resp.get_json()
 
-        # Update the item's quantity
-        updated_quantity = new_item["quantity"] + 5
+        data = resp.get_json()
+        logging.debug(data)
+        item_id = data["id"]
+        item_desc = data["description"]
+        item_price = data["price"]
+        data["item_id"] = "ABC123"
+        data["quantity"] = 56789
+
+        # send the update back
         resp = self.client.put(
-            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}",
-            json={"quantity": updated_quantity},
+            f"{BASE_URL}/{shopcart.id}/items/{item_id}",
+            json=data,
+            content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        # Verify the item's quantity has been updated
+        # retrieve it back
         resp = self.client.get(
-            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}"
+            f"{BASE_URL}/{shopcart.id}/items/{item_id}",
+            content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
         data = resp.get_json()
-        self.assertEqual(data["quantity"], updated_quantity)
-
-    def test_update_non_existent_item(self):
-        """It should return 404 when trying to update an item that does not exist"""
-        # Create a shopcart
-        shopcart = ShopcartFactory()
-        resp = self.client.post(BASE_URL, json=shopcart.serialize())
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_shopcart = resp.get_json()
-
-        # Attempt to update a non-existent item
-        resp = self.client.put(
-            f"{BASE_URL}/{new_shopcart['id']}/items/0",  # Item ID 0 doesn't exist
-            json={"quantity": 10},
-        )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-        # Verify the error message
-        data = resp.get_json()
-        self.assertIn("was not found", data["message"])
-
-    def test_update_item_in_non_existent_shopcart(self):
-        """It should return 404 when trying to update an item in a non-existent shopcart"""
-        # Attempt to update an item in a non-existent shopcart
-        resp = self.client.put(
-            f"{BASE_URL}/0/items/1",  # Shopcart ID 0 doesn't exist
-            json={"quantity": 10},
-        )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-        # Verify the error message
-        data = resp.get_json()
-        self.assertIn("was not found", data["message"])
-
-    def test_update_item_with_invalid_quantity(self):
-        """It should return 400 when trying to update an item with an invalid quantity"""
-        # Create a shopcart
-        shopcart = ShopcartFactory()
-        resp = self.client.post(BASE_URL, json=shopcart.serialize())
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_shopcart = resp.get_json()
-
-        # Add an item to the shopcart
-        item = ItemFactory(shopcart_id=new_shopcart["id"])
-        resp = self.client.post(
-            f"{BASE_URL}/{new_shopcart['id']}/items", json=item.serialize()
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_item = resp.get_json()
-
-        # Attempt to update the item with a non-integer quantity
-        resp = self.client.put(
-            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}",
-            json={"quantity": "ten"},
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-        # Attempt to update the item with a negative quantity
-        resp = self.client.put(
-            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}",
-            json={"quantity": -5},
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-        # Attempt to update the item with zero quantity
-        resp = self.client.put(
-            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}",
-            json={"quantity": 0},
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_update_item_missing_quantity(self):
-        """It should return 400 when the quantity is missing in the update request"""
-        # Create a shopcart
-        shopcart = ShopcartFactory()
-        resp = self.client.post(BASE_URL, json=shopcart.serialize())
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_shopcart = resp.get_json()
-
-        # Add an item to the shopcart
-        item = ItemFactory(shopcart_id=new_shopcart["id"])
-        resp = self.client.post(
-            f"{BASE_URL}/{new_shopcart['id']}/items", json=item.serialize()
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_item = resp.get_json()
-
-        # Attempt to update the item without a quantity in the request body
-        resp = self.client.put(
-            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}", json={}
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-        # Verify the error message
-        data = resp.get_json()
-        self.assertIn("must contain 'quantity'", data["message"])
-
-    def test_update_item_with_unsupported_media_type(self):
-        """It should return 415 when trying to update with an unsupported content type"""
-        # Create a shopcart
-        shopcart = ShopcartFactory()
-        resp = self.client.post(BASE_URL, json=shopcart.serialize())
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_shopcart = resp.get_json()
-
-        # Add an item to the shopcart
-        item = ItemFactory(shopcart_id=new_shopcart["id"])
-        resp = self.client.post(
-            f"{BASE_URL}/{new_shopcart['id']}/items", json=item.serialize()
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        new_item = resp.get_json()
-
-        # Attempt to update the item with an unsupported content type
-        headers = {"Content-Type": "text/plain"}
-        data = "quantity: 10"
-        resp = self.client.put(
-            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}",
-            data=data,
-            headers=headers,
-        )
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-        # Verify the error message
-        data = resp.get_json()
-        self.assertIn("Unsupported media type", data["error"])
+        logging.debug(data)
+        self.assertEqual(data["id"], item_id)
+        self.assertEqual(data["item_id"], "ABC123")
+        self.assertEqual(data["description"], item_desc)
+        self.assertEqual(data["quantity"], 56789)
+        self.assertEqual(data["price"], item_price)
 
     # ----------------------------------------------------------
     # TEST DELETE
@@ -536,59 +463,3 @@ class TestShopcartService(TestCase):
         # Convert item_id from response to int and ensure the items returned are the ones we added
         self.assertEqual(int(data[0]["item_id"]), item1.item_id)
         self.assertEqual(int(data[1]["item_id"]), item2.item_id)
-
-    def test_create_shopcart_bad_request(self):
-        """It should return 400 Bad Request when the request data is invalid"""
-        # Create a shopcart payload without the required 'name' field
-        invalid_shopcart_data = {"description": "A shopcart without a name"}
-
-        # Send POST request to create a shopcart with invalid data
-        resp = self.client.post(BASE_URL, json=invalid_shopcart_data)
-
-        # Assert that the response status code is 400
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-        # Assert that the response contains expected error information
-        error_response = resp.get_json()
-        self.assertEqual(error_response["status"], status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(error_response["error"], "Bad Request")
-        self.assertIn("message", error_response)
-        # Optionally check if the error message contains specific text
-        self.assertIn("invalid", error_response["message"].lower())
-
-    def test_method_not_allowed(self):
-        """It should return 405 Method Not Allowed for unsupported HTTP methods"""
-        # Attempt to POST to an endpoint that only supports GET
-        resp = self.client.post("/", content_type="application/json")
-
-        # Assert that the response status code is 405
-        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-        # Assert that the response contains expected error information
-        error_response = resp.get_json()
-        self.assertEqual(error_response["status"], status.HTTP_405_METHOD_NOT_ALLOWED)
-        self.assertEqual(error_response["error"], "Method not Allowed")
-        self.assertIn("message", error_response)
-        # Optionally check if the error message contains specific text related to method not allowed
-        self.assertIn("not allowed", error_response["message"].lower())
-
-    def test_unsupported_media_type(self):
-        """It should return 415 Unsupported Media Type for unsupported Content-Type"""
-        # Send a request with an unsupported Content-Type
-        headers = {"Content-Type": "text/plain"}
-        data = "This is not JSON"
-
-        resp = self.client.post(BASE_URL, data=data, headers=headers)
-
-        # Assert that the response status code is 415
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-        # Assert that the response contains expected error information
-        error_response = resp.get_json()
-        self.assertEqual(
-            error_response["status"], status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-        )
-        self.assertEqual(error_response["error"], "Unsupported media type")
-        self.assertIn("message", error_response)
-        # Optionally check if the error message contains specific text related to unsupported media type
-        self.assertIn("unsupported", error_response["message"].lower())
