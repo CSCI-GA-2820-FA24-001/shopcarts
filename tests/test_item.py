@@ -49,15 +49,14 @@ class TestItem(TestCase):
     ######################################################################
     def test_repr(self):
         """Test the __repr__ method"""
-        # Create a sample item with necessary attributes
-        item = Item(
-            item_id="item123",
-            id=1,
-            shopcart_id=456,
-            description="Sample item description",
-            quantity=10,
-            price=2050,
-        )
+        # Create a sample item and set attributes after instantiation
+        item = Item()
+        item.item_id = "item123"
+        item.id = 1
+        item.shopcart_id = 456
+        item.description = "Sample item description"
+        item.quantity = 10
+        item.price = 2050
 
         # Expected __repr__ output
         expected_repr = "<Item item123 id=[1] shopcart[456]>"
@@ -67,15 +66,14 @@ class TestItem(TestCase):
 
     def test_str(self):
         """Test the __str__ method"""
-        # Create a sample item with necessary attributes
-        item = Item(
-            item_id="item123",
-            id=1,
-            shopcart_id=456,
-            description="Sample item description",
-            quantity=10,
-            price=2050,
-        )
+        # Create a sample item and set attributes after instantiation
+        item = Item()
+        item.item_id = "item123"
+        item.id = 1
+        item.shopcart_id = 456
+        item.description = "Sample item description"
+        item.quantity = 10
+        item.price = 2050
 
         # Expected __str__ output
         expected_str = "item123: Sample item description, 10, 2050"
@@ -140,6 +138,7 @@ class TestItem(TestCase):
     # TEST READ
     # ----------------------------------------------------------
     def test_read_item_from_shopcart(self):
+        """It should read an item from the database"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
 
