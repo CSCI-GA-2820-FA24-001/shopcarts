@@ -6,7 +6,7 @@ import logging
 import os
 from unittest import TestCase
 from wsgi import app
-from service.models import Shopcart, Item, DataValidationError, db
+from service.models import Shopcart, Item, db
 from tests.factories import ShopcartFactory, ItemFactory
 
 DATABASE_URI = os.getenv(

@@ -88,42 +88,6 @@ class TestShopcartService(TestCase):
 
         return shopcarts
 
-    def _create_shopcart_with_item(self, name="Test Shopcart", item_data=None):
-        """Helper function to create a shopcart with one item and persist to the database.
-
-        Args:
-            name (str): Name of the shopcart to create.
-            item_data (dict): Data for the item to create. If None, defaults to a sample item.
-
-        Returns:
-            tuple: The created Shopcart and Item objects.
-        """
-        # Create a default item if no item_data is provided
-        if item_data is None:
-            item_data = {
-                "item_id": "item1",
-                "description": "Sample Item",
-                "quantity": 1,
-                "price": 100,
-            }
-
-        # Create an item using the ItemFactory
-        item = ItemFactory(**item_data)
-
-        # Create a shopcart and associate the item with it
-        shopcart = ShopcartFactory(name=name, items=[item])  # Pass item in a list
-
-        resp = self.client.post(
-            BASE_URL, json=shopcart.serialize(), content_type="application/json"
-        )
-        self.assertEqual(
-            resp.status_code,
-            status.HTTP_201_CREATED,
-            "Could not create shopcart-with-item",
-        )
-
-        return shopcart, item
-
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
