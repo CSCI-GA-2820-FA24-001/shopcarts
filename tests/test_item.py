@@ -50,16 +50,12 @@ class TestItem(TestCase):
     def test_repr(self):
         """Test the __repr__ method"""
         # Create a sample item and set attributes after instantiation
-        item = Item()
-        item.item_id = "item123"
-        item.id = 1
-        item.shopcart_id = 456
-        item.description = "Sample item description"
-        item.quantity = 10
-        item.price = 2050
+        item = ItemFactory()
 
         # Expected __repr__ output
-        expected_repr = "<Item item123 id=[1] shopcart[456]>"
+        expected_repr = (
+            f"<Item {item.item_id} id=[{item.id}] shopcart[{item.shopcart_id}]>"
+        )
 
         # Assert that the __repr__ returns the correct value
         self.assertEqual(repr(item), expected_repr)
@@ -67,16 +63,12 @@ class TestItem(TestCase):
     def test_str(self):
         """Test the __str__ method"""
         # Create a sample item and set attributes after instantiation
-        item = Item()
-        item.item_id = "item123"
-        item.id = 1
-        item.shopcart_id = 456
-        item.description = "Sample item description"
-        item.quantity = 10
-        item.price = 2050
+        item = ItemFactory()
 
         # Expected __str__ output
-        expected_str = "item123: Sample item description, 10, 2050"
+        expected_str = (
+            f"{item.item_id}: {item.description}, {item.quantity}, {item.price}"
+        )
 
         # Assert that the __str__ returns the correct value
         self.assertEqual(str(item), expected_str)
