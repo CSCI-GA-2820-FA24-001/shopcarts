@@ -51,12 +51,31 @@ class Item(db.Model, PersistentBase):
         Args:
             data (dict): A dictionary containing the resource data
         """
+        # try:
+        #     self.shopcart_id = data["shopcart_id"]
+        #     self.item_id = data["item_id"]
+        #     self.description = data["description"]
+        #     self.quantity = data["quantity"]
+        #     self.price = data["price"]
+        # except AttributeError as error:
+        #     raise DataValidationError("Invalid attribute: " + error.args[0]) from error
+        # except KeyError as error:
+        #     raise DataValidationError(
+        #         "Invalid Item: missing " + error.args[0]
+        #     ) from error
+        # except TypeError as error:
+        #     raise DataValidationError(
+        #         "Invalid Item: body of request contained bad or no data " + str(error)
+        #     ) from error
         try:
             self.shopcart_id = data["shopcart_id"]
             self.item_id = data["item_id"]
             self.description = data["description"]
-            self.quantity = data["quantity"]
-            self.price = data["price"]
+            # Ensure quantity and price are integers
+            self.quantity = int(data["quantity"])
+            self.price = int(data["price"])
+        except ValueError as error:
+            raise DataValidationError("Invalid data type: " + str(error)) from error
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:

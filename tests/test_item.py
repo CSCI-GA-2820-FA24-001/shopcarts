@@ -48,8 +48,36 @@ class TestItem(TestCase):
     #  T E S T   C A S E S
     ######################################################################
 
+    def test_serialize_a_item(self):
+        """It should serialize a Item"""
+        item = ItemFactory()
+        serial_item = item.serialize()
+        self.assertEqual(serial_item["id"], item.id)
+        self.assertEqual(serial_item["shopcart_id"], item.shopcart_id)
+        self.assertEqual(serial_item["item_id"], item.item_id)
+        self.assertEqual(serial_item["description"], item.description)
+        self.assertEqual(serial_item["quantity"], item.quantity)
+        self.assertEqual(serial_item["price"], item.price)
+
+    def test_deserialize_a_item(self):
+        """It should deserialize a Item"""
+        item = ItemFactory()
+        item.create()
+
+        new_item = Item()
+        new_item = item.deserialize(item.serialize())
+        self.assertEqual(new_item.id, item.id)
+        self.assertEqual(new_item.shopcart_id, item.shopcart_id)
+        self.assertEqual(new_item.description, item.description)
+        self.assertEqual(new_item.description, item.description)
+        self.assertEqual(new_item.quantity, item.quantity)
+        self.assertEqual(new_item.price, item.price)
+
+    # ----------------------------------------------------------
+    # TEST CREATE
+    # ----------------------------------------------------------
     def test_add_shopcart_product(self):
-        """It should Create a shopcart with a item and add it to the database"""
+        """It should Create a shopcart with a item and add it to the serial_itembase"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopcartFactory()
@@ -57,7 +85,7 @@ class TestItem(TestCase):
 
         shopcart.items.append(item)
         shopcart.create()
-        # Assert that it was assigned an id and shows up in the database
+        # Assert that it was assigned an id and shows up in the serial_itembase
         self.assertIsNotNone(shopcart.id)
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 1)
@@ -72,3 +100,73 @@ class TestItem(TestCase):
         new_shopcart = Shopcart.find(shopcart.id)
         self.assertEqual(len(new_shopcart.items), 2)
         self.assertEqual(new_shopcart.items[1].item_id, product2.item_id)
+
+    # ----------------------------------------------------------
+    # TEST READ
+    # ----------------------------------------------------------
+    def test_read_item_from_shopcart(self):
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+
+        # Create a shopcart and add an item
+        shopcart = ShopcartFactory()
+        item = ItemFactory(shopcart=shopcart)
+        shopcart.items.append(item)
+        shopcart.create()
+
+        # Fetch the shopcart from the database and verify it contains one item
+        new_shopcart = Shopcart.find(shopcart.id)
+        self.assertIsNotNone(new_shopcart)
+        self.assertEqual(len(new_shopcart.items), 1)
+
+        # Verify item details by searching within new_shopcart.items
+        retrieved_item = next(
+            (i for i in new_shopcart.items if str(i.item_id) == str(item.item_id)),
+            None,
+        )
+
+        # Assertions to ensure the retrieved item matches the expected values
+        self.assertIsNotNone(retrieved_item)
+        self.assertEqual(str(retrieved_item.item_id), str(item.item_id))
+        self.assertEqual(retrieved_item.description, item.description)
+        self.assertEqual(retrieved_item.quantity, item.quantity)
+        self.assertEqual(retrieved_item.price, item.price)
+
+    # ----------------------------------------------------------
+    # TEST DELETE
+    # ----------------------------------------------------------
+    def test_delete_item(self):
+        """It should Delete an Item from the database"""
+        item = ItemFactory()
+        item.create()
+        self.assertIsNotNone(item.id)
+
+        # Delete the item and check if it has been removed
+        item.delete()
+        items = Item.all()
+        self.assertEqual(len(items), 0)
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
+    def test_list_all_items_in_shopcart(self):
+        """It should List all items in a Shopcart"""
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+
+        # Create a shopcart and add two items
+        shopcart = ShopcartFactory()
+        item1 = ItemFactory(shopcart=shopcart)
+        item2 = ItemFactory(shopcart=shopcart)
+        shopcart.items.append(item1)
+        shopcart.items.append(item2)
+        shopcart.create()
+
+        # Retrieve all items in the shopcart
+        shopcart = Shopcart.find(shopcart.id)
+        items = shopcart.items
+
+        # Verify the response contains both items
+        self.assertEqual(len(items), 2)
+        self.assertEqual(items[0].item_id, item1.item_id)
+        self.assertEqual(items[1].item_id, item2.item_id)
