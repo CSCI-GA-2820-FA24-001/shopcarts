@@ -159,6 +159,37 @@ class TestItem(TestCase):
         self.assertEqual(retrieved_item.price, item.price)
 
     # ----------------------------------------------------------
+    # TEST UPDATE
+    # ----------------------------------------------------------
+    def test_update_shopcart_item(self):
+        """It should Update an shopcarts item"""
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+
+        shopcart = ShopcartFactory()
+        item = ItemFactory(shopcart=shopcart)
+        shopcart.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(shopcart.id)
+        shopcarts = Shopcart.all()
+        self.assertEqual(len(shopcarts), 1)
+
+        # Fetch it back
+        shopcart = Shopcart.find(shopcart.id)
+        old_item = shopcart.items[0]
+        self.assertEqual(old_item.price, item.price)
+        self.assertEqual(old_item.quantity, item.quantity)
+        self.assertEqual(old_item.description, item.description)
+        # Change the price
+        old_item.price = 1024
+        shopcart.update()
+
+        # Fetch it back again
+        shopcart = Shopcart.find(shopcart.id)
+        item = shopcart.items[0]
+        self.assertEqual(item.price, 1024)
+
+    # ----------------------------------------------------------
     # TEST DELETE
     # ----------------------------------------------------------
     def test_delete_item(self):
