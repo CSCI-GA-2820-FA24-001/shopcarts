@@ -47,6 +47,41 @@ class TestItem(TestCase):
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
+    def test_repr(self):
+        """Test the __repr__ method"""
+        # Create a sample item with necessary attributes
+        item = Item(
+            item_id="item123",
+            id=1,
+            shopcart_id=456,
+            description="Sample item description",
+            quantity=10,
+            price=2050,
+        )
+
+        # Expected __repr__ output
+        expected_repr = "<Item item123 id=[1] shopcart[456]>"
+
+        # Assert that the __repr__ returns the correct value
+        self.assertEqual(repr(item), expected_repr)
+
+    def test_str(self):
+        """Test the __str__ method"""
+        # Create a sample item with necessary attributes
+        item = Item(
+            item_id="item123",
+            id=1,
+            shopcart_id=456,
+            description="Sample item description",
+            quantity=10,
+            price=2050,
+        )
+
+        # Expected __str__ output
+        expected_str = "item123: Sample item description, 10, 2050"
+
+        # Assert that the __str__ returns the correct value
+        self.assertEqual(str(item), expected_str)
 
     def test_serialize_a_item(self):
         """It should serialize a Item"""
