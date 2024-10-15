@@ -24,7 +24,7 @@ import logging
 from unittest import TestCase
 from wsgi import app
 from service.common import status
-from service.models import db, Shopcart, Item
+from service.models import db, Shopcart
 from tests.factories import ShopcartFactory, ItemFactory
 
 DATABASE_URI = os.getenv(
@@ -293,6 +293,163 @@ class TestShopcartService(TestCase):
     # ----------------------------------------------------------
     # TEST UPDATE
     # ----------------------------------------------------------
+
+    def test_update_item_quantity(self):
+        """It should update the quantity of an existing item in a shopcart"""
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_shopcart = resp.get_json()
+
+        # Add an item to the shopcart
+        item = ItemFactory(shopcart_id=new_shopcart["id"])
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_item = resp.get_json()
+
+        # Update the item's quantity
+        updated_quantity = new_item["quantity"] + 5
+        resp = self.client.put(
+            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}",
+            json={"quantity": updated_quantity},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # Verify the item's quantity has been updated
+        resp = self.client.get(
+            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["quantity"], updated_quantity)
+
+    def test_update_non_existent_item(self):
+        """It should return 404 when trying to update an item that does not exist"""
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_shopcart = resp.get_json()
+
+        # Attempt to update a non-existent item
+        resp = self.client.put(
+            f"{BASE_URL}/{new_shopcart['id']}/items/0",  # Item ID 0 doesn't exist
+            json={"quantity": 10},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Verify the error message
+        data = resp.get_json()
+        self.assertIn("was not found", data["message"])
+
+    def test_update_item_in_non_existent_shopcart(self):
+        """It should return 404 when trying to update an item in a non-existent shopcart"""
+        # Attempt to update an item in a non-existent shopcart
+        resp = self.client.put(
+            f"{BASE_URL}/0/items/1",  # Shopcart ID 0 doesn't exist
+            json={"quantity": 10},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Verify the error message
+        data = resp.get_json()
+        self.assertIn("was not found", data["message"])
+
+    def test_update_item_with_invalid_quantity(self):
+        """It should return 400 when trying to update an item with an invalid quantity"""
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_shopcart = resp.get_json()
+
+        # Add an item to the shopcart
+        item = ItemFactory(shopcart_id=new_shopcart["id"])
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_item = resp.get_json()
+
+        # Attempt to update the item with a non-integer quantity
+        resp = self.client.put(
+            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}",
+            json={"quantity": "ten"},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Attempt to update the item with a negative quantity
+        resp = self.client.put(
+            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}",
+            json={"quantity": -5},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Attempt to update the item with zero quantity
+        resp = self.client.put(
+            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}",
+            json={"quantity": 0},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_item_missing_quantity(self):
+        """It should return 400 when the quantity is missing in the update request"""
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_shopcart = resp.get_json()
+
+        # Add an item to the shopcart
+        item = ItemFactory(shopcart_id=new_shopcart["id"])
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_item = resp.get_json()
+
+        # Attempt to update the item without a quantity in the request body
+        resp = self.client.put(
+            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}", json={}
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Verify the error message
+        data = resp.get_json()
+        self.assertIn("must contain 'quantity'", data["message"])
+
+    def test_update_item_with_unsupported_media_type(self):
+        """It should return 415 when trying to update with an unsupported content type"""
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_shopcart = resp.get_json()
+
+        # Add an item to the shopcart
+        item = ItemFactory(shopcart_id=new_shopcart["id"])
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_item = resp.get_json()
+
+        # Attempt to update the item with an unsupported content type
+        headers = {"Content-Type": "text/plain"}
+        data = "quantity: 10"
+        resp = self.client.put(
+            f"{BASE_URL}/{new_shopcart['id']}/items/{new_item['id']}",
+            data=data,
+            headers=headers,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+        # Verify the error message
+        data = resp.get_json()
+        self.assertIn("Unsupported media type", data["error"])
 
     # ----------------------------------------------------------
     # TEST DELETE

@@ -245,6 +245,50 @@ def get_items(shopcart_id, item_id):
 
 
 ######################################################################
+# UPDATE AN ITEM'S QUANTITY IN A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:uid>/items/<int:pid>", methods=["PUT"])
+def update_item_quantity(uid, pid):
+    """
+    Update an item's quantity in the shopcart
+
+    This endpoint allows updating the quantity of an item in a given shopcart.
+    """
+    app.logger.info("Request to update item %s in shopcart %s", pid, uid)
+
+    # Find the shopcart by uid
+    shopcart = Shopcart.find(uid)
+    if not shopcart:
+        abort(status.HTTP_404_NOT_FOUND, f"Shopcart with id {uid} was not found")
+
+    # Find the item in the shopcart by pid
+    item = next((item for item in shopcart.items if item.id == pid), None)
+    if not item:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Item with id {pid} was not found in shopcart {uid}",
+        )
+
+    # Get the new quantity from the request body
+    body = request.get_json()
+    if not body or "quantity" not in body:
+        abort(status.HTTP_400_BAD_REQUEST, "Request body must contain 'quantity'")
+
+    new_quantity = body["quantity"]
+    if not isinstance(new_quantity, int) or new_quantity <= 0:
+        abort(status.HTTP_400_BAD_REQUEST, "Quantity must be a positive integer")
+
+    # Update the item's quantity
+    item.quantity = new_quantity
+    item.update()
+
+    app.logger.info(
+        "Updated item %s in shopcart %s to quantity %d", pid, uid, new_quantity
+    )
+    return jsonify(item.serialize()), status.HTTP_200_OK
+
+
+######################################################################
 # DELETE AN ITEM FROM A SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["DELETE"])
