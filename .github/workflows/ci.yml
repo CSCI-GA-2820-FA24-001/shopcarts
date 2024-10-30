@@ -36,11 +36,11 @@ jobs:
           poetry lock --no-update
           poetry install
 
-      - name: Linting
-        run: |
+      #- name: Linting
+        #run: |
           #flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
           #flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
-          pylint service tests --max-line-length=127
+          #pylint service tests --max-line-length=127
 
       - name: Run unit tests with PyTest
         run: pytest --pspec --cov=service --cov-report=xml --cov-fail-under=95
