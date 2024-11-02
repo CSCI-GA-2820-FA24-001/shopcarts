@@ -42,10 +42,10 @@ jobs:
           #poetry run pylint service tests --max-line-length=127
           echo "Linting completed"
 
-      #- name: Run unit tests with PyTest
-        #run: poetry run pytest --pspec --cov=service --cov-report=xml --cov-fail-under=95
-        #env:
-          #DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@localhost:5432/postgres"
+      - name: Run unit tests with PyTest
+        run: poetry run pytest --pspec --cov=service --cov-report=xml --cov-fail-under=95
+        env:
+          DATABASE_URI: "postgresql+psycopg://postgres:postgres@localhost:5432/postgres"
 
       # Uncomment to upload coverage to Codecov
       # - name: Upload coverage reports to Codecov
