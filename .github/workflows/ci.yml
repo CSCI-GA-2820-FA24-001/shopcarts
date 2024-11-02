@@ -43,7 +43,7 @@ jobs:
           #pylint service tests --max-line-length=127
 
       - name: Run unit tests with PyTest
-        run: pytest --pspec --cov=service --cov-report=xml --cov-fail-under=95
+        run: poetry run pytest --pspec --cov=service --cov-report=xml --cov-fail-under=95
         env:
           DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@localhost:5432/postgres"
 
