@@ -28,23 +28,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-            
+
       - name: Install dependencies
         run: |
-          python -m venv venv
-          venv/bin/pip install poetry
-          venv/bin/poetry config virtualenvs.create false
-          venv/bin/poetry lock --no-update
-          venv/bin/poetry install
-
-      #- name: Linting
-        #run: |
-          #flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
-          #flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
-          #pylint service tests --max-line-length=127
+          python -m pip install poetry
+          poetry config virtualenvs.create true
+          poetry lock --no-update
+          poetry install
+      - name: Linting
+        run: |
+          poetry run flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
+          poetry run flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
+          poetry run pylint service tests --max-line-length=127
 
       - name: Run unit tests with PyTest
-        run: venv/bin/pytest --pspec --cov=service --cov-report=xml --cov-fail-under=95
+        run: poetry run pytest --pspec --cov=service --cov-report=xml --cov-fail-under=95
         env:
           DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@localhost:5432/postgres"
 
@@ -52,4 +50,5 @@ jobs:
       # - name: Upload coverage reports to Codecov
       #   uses: codecov/codecov-action@v3.1.4
       #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
       #     token: ${{ secrets.CODECOV_TOKEN }}
