@@ -410,7 +410,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_item_not_found(self):
-        """It should return 404 when trying to delete an item that does not exist"""
+        """It should return 204 when trying to delete an item that does not exist"""
         # Create a shopcart
         shopcart = ShopcartFactory()
         resp = self.client.post(BASE_URL, json=shopcart.serialize())
@@ -422,8 +422,9 @@ class TestShopcartService(TestCase):
             f"{BASE_URL}/{new_shopcart['id']}/items/0"
         )  # ID 0 doesn't exist
         self.assertEqual(
-            resp.status_code, status.HTTP_404_NOT_FOUND
-        )  # Expect 404 for non-existent item
+            resp.status_code, status.HTTP_204_NO_CONTENT
+        )  # Expect 204 for non-existent item
+
 
     # ----------------------------------------------------------
     # TEST LIST

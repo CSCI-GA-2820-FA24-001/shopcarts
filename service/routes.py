@@ -313,16 +313,13 @@ def delete_item_from_shopcart(shopcart_id, item_id):
 
     # Find the item by item_id within the shopcart
     item = Item.query.filter_by(id=item_id, shopcart_id=shopcart_id).first()
-    if not item:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Item with id '{item_id}' in Shopcart '{shopcart_id}' was not found.",
-        )
+    if item:
+        # Delete the item if it exists
+        item.delete()
+        app.logger.info("Item with id %s deleted from Shopcart %s", item_id, shopcart_id)
+    else:
+        app.logger.info("Item with id %s not found in Shopcart %s", item_id, shopcart_id)
 
-    # Delete the item
-    item.delete()
-
-    app.logger.info("Item with id %s deleted from Shopcart %s", item_id, shopcart_id)
     return {}, status.HTTP_204_NO_CONTENT
 
 
