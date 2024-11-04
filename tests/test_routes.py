@@ -425,7 +425,6 @@ class TestShopcartService(TestCase):
             resp.status_code, status.HTTP_204_NO_CONTENT
         )  # Expect 204 for non-existent item
 
-
     # ----------------------------------------------------------
     # TEST LIST
     # ----------------------------------------------------------

@@ -316,9 +316,13 @@ def delete_item_from_shopcart(shopcart_id, item_id):
     if item:
         # Delete the item if it exists
         item.delete()
-        app.logger.info("Item with id %s deleted from Shopcart %s", item_id, shopcart_id)
+        app.logger.info(
+            "Item with id %s deleted from Shopcart %s", item_id, shopcart_id
+        )
     else:
-        app.logger.info("Item with id %s not found in Shopcart %s", item_id, shopcart_id)
+        app.logger.info(
+            "Item with id %s not found in Shopcart %s", item_id, shopcart_id
+        )
 
     return {}, status.HTTP_204_NO_CONTENT
 
