@@ -42,7 +42,7 @@ jobs:
           echo "Linting completed"
 
       - name: Run unit tests with PyTest
-        run: poetry run pytest --pspec --cov=service --cov-report=xml --cov-fail-under=95
+        run: pytest --pspec --cov=service --cov-fail-under=95 --disable-warnings
         env:
           DATABASE_URI: "postgresql+psycopg://postgres:postgres@postgres:5432/postgres"
                          
