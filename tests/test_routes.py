@@ -22,7 +22,6 @@ TestYourResourceModel API Service Test Suite
 import os
 import logging
 from unittest import TestCase
-import unittest
 from wsgi import app
 from service.common import status
 from service.models import db, Shopcart
