@@ -22,6 +22,7 @@ TestYourResourceModel API Service Test Suite
 import os
 import logging
 from unittest import TestCase
+import unittest
 from wsgi import app
 from service.common import status
 from service.models import db, Shopcart
@@ -508,3 +509,19 @@ class TestShopcartService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 0)
+
+    def test_clear_nonexistent_shopcart(self):
+        """Request clear for a nonexistent shopcart will get error 404"""
+
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Delete the shopcart
+        resp = self.client.delete(f"{BASE_URL}/{shopcart.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id}/clear")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
