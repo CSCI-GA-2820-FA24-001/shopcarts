@@ -562,6 +562,7 @@ class TestShopcartService(TestCase):
 
         expected_total_price = 10 + 20 + 30
         self.assertEqual(data["total_price"], expected_total_price)
+
     #####################################################################
     #  A C T I O N S   T E S T   C A S E S
     ######################################################################
