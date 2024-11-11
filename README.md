@@ -77,6 +77,12 @@ Here’s a list of available API endpoints with their descriptions:
 | PUT         | /shopcarts/{shopcart_id}/items/{item_id}      | Update an item in a shopcart                        |
 | DELETE      | /shopcarts/{shopcart_id}/items/{item_id}      | Delete an item from a shopcart                      |
 
+## ACTIONS Endpoints
+
+| HTTP Method | Endpoint                                      | Description                                         |
+|-------------|-----------------------------------------------|-----------------------------------------------------|
+| PUT         | /shopcarts/{shopcart_id}/clear                                  | Clear the shopcart                  |
+
 
 ### 1. **GET /**
 

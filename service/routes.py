@@ -421,3 +421,25 @@ def check_content_type(content_type):
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
     )
+
+
+######################################################################
+#  A C T I O N S
+######################################################################
+
+
+@app.route("/shopcarts/<int:shopcart_id>/clear", methods=["PUT"])
+def clear_shopcart_action(shopcart_id):
+    """Clear the shopcart"""
+    app.logger.info(f"Request to clear shopcart : {shopcart_id}")
+
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(status.HTTP_404_NOT_FOUND, f"No such shopcart : {shopcart_id}.")
+
+    for item in shopcart.items:
+        item.delete()
+
+    shopcart.update()
+
+    return jsonify(shopcart.serialize()), status.HTTP_200_OK
