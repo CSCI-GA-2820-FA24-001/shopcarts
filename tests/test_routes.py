@@ -463,3 +463,48 @@ class TestShopcartService(TestCase):
         # Convert item_id from response to int and ensure the items returned are the ones we added
         self.assertEqual(int(data[0]["item_id"]), item1.item_id)
         self.assertEqual(int(data[1]["item_id"]), item2.item_id)
+
+    ######################################################################
+    #  A C T I O N S   T E S T   C A S E S
+    ######################################################################
+
+    def test_clear_shopcart(self):
+        """After a clear action is requested, no item should be in the shopcart"""
+
+        # Create a shopcart
+        shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        new_shopcart = resp.get_json()
+
+        # Add multiple items to the shopcart
+        item1 = ItemFactory(shopcart_id=new_shopcart["id"])
+        item2 = ItemFactory(shopcart_id=new_shopcart["id"])
+
+        # Add item1
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item1.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Add item2
+        resp = self.client.post(
+            f"{BASE_URL}/{new_shopcart['id']}/items", json=item2.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Ensure now the shopcart has 2 items
+        resp = self.client.get(f"{BASE_URL}/{new_shopcart['id']}/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+
+        # Make a clear request
+        resp = self.client.put(f"{BASE_URL}/{new_shopcart['id']}/clear")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # Ensure now the shopcart has no item
+        resp = self.client.get(f"{BASE_URL}/{new_shopcart['id']}/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 0)
