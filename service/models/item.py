@@ -88,3 +88,43 @@ class Item(db.Model, PersistentBase):
             ) from error
 
         return self
+
+    @classmethod
+    def find_by_id(cls, id):
+        """Returns all items with the given id
+
+        Args:
+            id (integer): the name of the Accounts you want to match
+        """
+        logger.info("Processing id query for %s ...", id)
+        return cls.query.filter(cls.id == id)
+
+    @classmethod
+    def find_by_price(cls, price):
+        """Returns all items with the given price
+
+        Args:
+            price (integer): the name of the Accounts you want to match
+        """
+        logger.info("Processing price query for %s ...", price)
+        return cls.query.filter(cls.price == price)
+
+    @classmethod
+    def find_by_item_id(cls, item_id):
+        """Returns all items with the given item_id
+
+        Args:
+            item_id (String): the name of the Accounts you want to match
+        """
+        logger.info("Processing id query for %s ...", item_id)
+        return cls.query.filter(cls.item_id == item_id)
+
+    @classmethod
+    def find_by_quantity(cls, quantity):
+        """Returns all items with the given quantity
+
+        Args:
+            quantity (integer): the name of the Accounts you want to match
+        """
+        logger.info("Processing id query for %s ...", quantity)
+        return cls.query.filter(cls.quantity == quantity)
