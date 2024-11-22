@@ -227,3 +227,66 @@ class TestItem(TestCase):
         self.assertEqual(len(items), 2)
         self.assertEqual(items[0].item_id, item1.item_id)
         self.assertEqual(items[1].item_id, item2.item_id)
+
+    # ----------------------------------------------------------
+    # QUERY
+    # ----------------------------------------------------------
+
+    def test_find_by_id(self):
+        """It should Find an item by id"""
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+
+        shopcart = ShopcartFactory()
+        shopcart.create()
+        item = ItemFactory(shopcart=shopcart)
+        item.create()
+
+        # Fetch it back by id
+        same_item = Item.find_by_id(item.id)[0]
+        self.assertEqual(same_item.id, item.id)
+        self.assertEqual(same_item.item_id, item.item_id)
+
+    def test_find_by_price(self):
+        """It should Find an item by price"""
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+
+        shopcart = ShopcartFactory()
+        shopcart.create()
+        item = ItemFactory(shopcart=shopcart)
+        item.create()
+
+        # Fetch it back by price
+        same_item = Item.find_by_price(item.price)[0]
+        self.assertEqual(same_item.price, item.price)
+        self.assertEqual(same_item.item_id, item.item_id)
+
+    def test_find_by_item_id(self):
+        """It should Find an item by item_id"""
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+
+        shopcart = ShopcartFactory()
+        shopcart.create()
+        item = ItemFactory(shopcart=shopcart)
+        item.create()
+
+        # Fetch it back by price
+        same_item = Item.find_by_item_id(item.item_id)[0]
+        self.assertEqual(same_item.item_id, item.item_id)
+
+    def test_find_by_quantity(self):
+        """It should Find an item by quantity"""
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+
+        shopcart = ShopcartFactory()
+        shopcart.create()
+        item = ItemFactory(shopcart=shopcart)
+        item.create()
+
+        # Fetch it back by quantity
+        same_item = Item.find_by_quantity(item.quantity)[0]
+        self.assertEqual(same_item.item_id, item.item_id)
+        self.assertEqual(same_item.quantity, item.quantity)

@@ -347,10 +347,30 @@ def list_items_in_shopcart(shopcart_id):
         )
 
     # Serialize all items in the shopcart
-    items = [item.serialize() for item in shopcart.items]
+    # items = [item.serialize() for item in shopcart.items]
 
-    app.logger.info("Returning %d items from Shopcart %s", len(items), shopcart_id)
-    return jsonify(items), status.HTTP_200_OK
+    # app.logger.info("Returning %d items from Shopcart %s", len(items), shopcart_id)
+
+    items = shopcart.items
+
+    item_id = request.args.get("item_id")
+    quantity = request.args.get("quantity")
+    price = request.args.get("price")
+
+    # Filter items based on query parameters
+    if item_id:
+        app.logger.info("Filter by item_id: %s", item_id)
+        items = [item for item in items if str(item.item_id) == item_id]
+    if quantity:
+        app.logger.info("Filter by quantity: %s", quantity)
+        items = [item for item in items if str(item.quantity) == quantity]
+    if price:
+        app.logger.info("Filter by price: %s", price)
+        items = [item for item in items if str(item.price) == price]
+    result = [item.serialize() for item in items]
+    app.logger.info("Returning %d items from Shopcart %s", len(result), shopcart_id)
+
+    return jsonify(result), status.HTTP_200_OK
 
 
 ######################################################################

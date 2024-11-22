@@ -437,8 +437,8 @@ class TestShopcartService(TestCase):
         new_shopcart = resp.get_json()
 
         # Add multiple items to the shopcart
-        item1 = ItemFactory(shopcart_id=new_shopcart["id"])
-        item2 = ItemFactory(shopcart_id=new_shopcart["id"])
+        item1 = ItemFactory(shopcart_id=new_shopcart["id"], quantity=2, price=10)
+        item2 = ItemFactory(shopcart_id=new_shopcart["id"], quantity=5, price=20.0)
 
         # Add item1
         resp = self.client.post(
@@ -455,7 +455,6 @@ class TestShopcartService(TestCase):
         # Retrieve all items in the shopcart
         resp = self.client.get(f"{BASE_URL}/{new_shopcart['id']}/items")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
         # Verify the response contains both items
         data = resp.get_json()
         self.assertEqual(len(data), 2)
@@ -463,6 +462,30 @@ class TestShopcartService(TestCase):
         # Convert item_id from response to int and ensure the items returned are the ones we added
         self.assertEqual(int(data[0]["item_id"]), item1.item_id)
         self.assertEqual(int(data[1]["item_id"]), item2.item_id)
+
+        # Test query by `price`
+        resp = self.client.get(f"{BASE_URL}/{new_shopcart['id']}/items?price=10")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+
+        self.assertEqual(len(data), 1)
+        self.assertEqual(float(data[0]["price"]), 10.0)
+
+        # Test query by `quantity`
+        resp = self.client.get(f"{BASE_URL}/{new_shopcart['id']}/items?quantity=5")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(int(data[0]["quantity"]), 5)
+
+        # Test query by `item_id`
+        resp = self.client.get(
+            f"{BASE_URL}/{new_shopcart['id']}/items?item_id={item1.item_id}"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(int(data[0]["item_id"]), item1.item_id)
 
     ######################################################################
     #  A C T I O N S   T E S T   C A S E S
