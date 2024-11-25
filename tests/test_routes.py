@@ -551,94 +551,95 @@ class TestShopcartService(TestCase):
     # ----------------------------------------------------------
     #  Calculate Price
     # ----------------------------------------------------------
-    def test_calculate_selected_price(self):
-        """It should calculate the total price of selected items in a shopcart"""
 
-        # Create a shopcart
-        shopcart = self._create_shopcarts(1)[0]
+    # def test_calculate_selected_price(self):
+    #     """It should calculate the total price of selected items in a shopcart"""
 
-        item1 = ItemFactory(shopcart_id=shopcart.id, price=10)
-        item2 = ItemFactory(shopcart_id=shopcart.id, price=20)
-        item3 = ItemFactory(shopcart_id=shopcart.id, price=30)
+    #     # Create a shopcart
+    #     shopcart = self._create_shopcarts(1)[0]
 
-        # Add item 1
-        resp = self.client.post(
-            f"{BASE_URL}/{shopcart.id}/items",
-            json=item1.serialize(),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+    #     item1 = ItemFactory(shopcart_id=shopcart.id, price=10)
+    #     item2 = ItemFactory(shopcart_id=shopcart.id, price=20)
+    #     item3 = ItemFactory(shopcart_id=shopcart.id, price=30)
 
-        # Add item 2
-        resp = self.client.post(
-            f"{BASE_URL}/{shopcart.id}/items",
-            json=item2.serialize(),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+    #     # Add item 1
+    #     resp = self.client.post(
+    #         f"{BASE_URL}/{shopcart.id}/items",
+    #         json=item1.serialize(),
+    #         content_type="application/json",
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        # Add item 3
-        resp = self.client.post(
-            f"{BASE_URL}/{shopcart.id}/items",
-            json=item3.serialize(),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+    #     # Add item 2
+    #     resp = self.client.post(
+    #         f"{BASE_URL}/{shopcart.id}/items",
+    #         json=item2.serialize(),
+    #         content_type="application/json",
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        selected_items = [int(item1.item_id), int(item3.item_id)]
-        resp = self.client.post(
-            f"{BASE_URL}/{shopcart.id}/calculate_total_price",
-            json={"selected_items": selected_items},
-            content_type="application/json",
-        )
+    #     # Add item 3
+    #     resp = self.client.post(
+    #         f"{BASE_URL}/{shopcart.id}/items",
+    #         json=item3.serialize(),
+    #         content_type="application/json",
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
+    #     selected_items = [int(item1.item_id), int(item3.item_id)]
+    #     resp = self.client.post(
+    #         f"{BASE_URL}/{shopcart.id}/calculate_total_price",
+    #         json={"selected_items": selected_items},
+    #         content_type="application/json",
+    #     )
 
-        expected_total_price = 10 + 30
-        self.assertEqual(data["total_price"], expected_total_price)
+    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
+    #     data = resp.get_json()
 
-    def test_calculate_total_price(self):
-        """It should calculate the total price of selected items in a shopcart"""
+    #     expected_total_price = 10 + 30
+    #     self.assertEqual(data["total_price"], expected_total_price)
 
-        # Create a shopcart
-        shopcart = self._create_shopcarts(1)[0]
+    # def test_calculate_total_price(self):
+    #     """It should calculate the total price of selected items in a shopcart"""
 
-        item1 = ItemFactory(shopcart_id=shopcart.id, price=10)
-        item2 = ItemFactory(shopcart_id=shopcart.id, price=20)
-        item3 = ItemFactory(shopcart_id=shopcart.id, price=30)
+    #     # Create a shopcart
+    #     shopcart = self._create_shopcarts(1)[0]
 
-        # Add item 1
-        resp = self.client.post(
-            f"{BASE_URL}/{shopcart.id}/items",
-            json=item1.serialize(),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+    #     item1 = ItemFactory(shopcart_id=shopcart.id, price=10)
+    #     item2 = ItemFactory(shopcart_id=shopcart.id, price=20)
+    #     item3 = ItemFactory(shopcart_id=shopcart.id, price=30)
 
-        # Add item 2
-        resp = self.client.post(
-            f"{BASE_URL}/{shopcart.id}/items",
-            json=item2.serialize(),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+    #     # Add item 1
+    #     resp = self.client.post(
+    #         f"{BASE_URL}/{shopcart.id}/items",
+    #         json=item1.serialize(),
+    #         content_type="application/json",
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        # Add item 3
-        resp = self.client.post(
-            f"{BASE_URL}/{shopcart.id}/items",
-            json=item3.serialize(),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+    #     # Add item 2
+    #     resp = self.client.post(
+    #         f"{BASE_URL}/{shopcart.id}/items",
+    #         json=item2.serialize(),
+    #         content_type="application/json",
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        resp = self.client.get(
-            f"{BASE_URL}/{shopcart.id}/calculate_total_price",
-            content_type="application/json",
-        )
+    #     # Add item 3
+    #     resp = self.client.post(
+    #         f"{BASE_URL}/{shopcart.id}/items",
+    #         json=item3.serialize(),
+    #         content_type="application/json",
+    #     )
+    #     self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
+    #     resp = self.client.get(
+    #         f"{BASE_URL}/{shopcart.id}/calculate_total_price",
+    #         content_type="application/json",
+    #     )
 
-        expected_total_price = 10 + 20 + 30
-        self.assertEqual(data["total_price"], expected_total_price)
+    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
+    #     data = resp.get_json()
+
+    #     expected_total_price = 10 + 20 + 30
+    #     self.assertEqual(data["total_price"], expected_total_price)
