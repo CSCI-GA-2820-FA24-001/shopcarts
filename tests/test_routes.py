@@ -96,9 +96,7 @@ class TestShopcartService(TestCase):
         """It should call the home page"""
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(data["name"], "Shopcarts REST API Service")
-        self.assertEqual(data["version"], "1.0")
+        self.assertIn(b"<title>Shopcart and Item Management</title>", resp.data)
 
     def test_health(self):
         """It should be healthy"""
