@@ -4,13 +4,11 @@ $(function () {
     //  U T I L I T Y   F U N C T I O N S
     // ****************************************
 
-    // Updates the form with data from the response
     function update_form_data(res) {
         $("#shopcart_id").val(res.id);
         $("#shopcart_name").val(res.name);
     }
 
-    /// Clears all form fields
     function clear_form_data() {
         $("#shopcart_id").val("");
         $("#shopcart_name").val("");
@@ -21,21 +19,18 @@ $(function () {
         $("#item_price").val("");
     }
 
-    // Updates the flash message area with styles for success or failure
     function flash_message(message, isSuccess = true) {
-        $("#flash_message").empty(); 
-        $("#flash_message").removeClass("alert-success alert-danger"); 
+        $("#flash_message").empty();
+        $("#flash_message").removeClass("alert-success alert-danger");
 
-        
         if (isSuccess) {
             $("#flash_message").addClass("alert alert-success");
         } else {
             $("#flash_message").addClass("alert alert-danger");
         }
 
-        $("#flash_message").append(message); 
+        $("#flash_message").append(message);
     }
-
 
     // ****************************************
     // Create a Shopcart
@@ -51,7 +46,7 @@ $(function () {
         };
 
         $("#flash_message").empty();
-        
+
         let ajax = $.ajax({
             type: "POST",
             url: "/shopcarts",
@@ -59,13 +54,13 @@ $(function () {
             data: JSON.stringify(data),
         });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res);
             flash_message("Shopcart created successfully!");
         });
 
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message,false);
+        ajax.fail(function (res) {
+            flash_message(res.responseJSON.message, false);
         });
     });
 
@@ -79,7 +74,7 @@ $(function () {
 
         let data = {
             "name": name,
-            "items":[]  // supplying an empty list of items does not delete any existing items
+            "items": []
         };
 
         $("#flash_message").empty();
@@ -91,13 +86,13 @@ $(function () {
             data: JSON.stringify(data),
         });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res);
             flash_message("Shopcart updated successfully!");
         });
 
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message,false);
+        ajax.fail(function (res) {
+            flash_message(res.responseJSON.message, false);
         });
     });
 
@@ -117,14 +112,14 @@ $(function () {
             data: '',
         });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res);
             flash_message("Shopcart retrieved successfully!");
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             clear_form_data();
-            flash_message(res.responseJSON.message,false);
+            flash_message(res.responseJSON.message, false);
         });
     });
 
@@ -144,13 +139,13 @@ $(function () {
             data: '',
         });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             clear_form_data();
             flash_message("Shopcart has been deleted!");
         });
 
-        ajax.fail(function(res){
-            flash_message("Server error!",false);
+        ajax.fail(function (res) {
+            flash_message("Server error!", false);
         });
     });
 
@@ -163,116 +158,169 @@ $(function () {
         clear_form_data();
     });
 
+    $("#clear-item-btn").click(function () {
+        $("#flash_message").empty();
+        clear_form_data();
+    });
+
     // ****************************************
     // Search Shopcarts
     // ****************************************
-    
+
     $("#search-shopcart-btn").click(function () {
         const shopcartID = $("#shopcart_id").val();
         const shopcartName = $("#shopcart_name").val();
-      
+
         $("#flash_message").empty();
-      
+
         let ajax = $.ajax({
-          type: "GET",
-          url: `/shopcarts`,
-          contentType: "application/json",
-          data: '',
+            type: "GET",
+            url: `/shopcarts`,
+            contentType: "application/json",
+            data: '',
         });
-      
+
         ajax.done(function (res) {
-          $("#shopcart_search_results tbody").empty();
-      
-          // Filter results using JavaScript
-          const filteredShopcarts = res.filter((shopcart) => {
-            let matchesID = shopcartID ? shopcart.id.toString() === shopcartID : true;
-            let matchesName = shopcartName ? shopcart.name.includes(shopcartName) : true;
-            return matchesID && matchesName;
-          });
-      
-          // Build table rows
-          let tableRows = "";
-          filteredShopcarts.forEach((shopcart) => {
-            tableRows += `<tr>
-                            <td>${shopcart.id}</td>
-                            <td>${shopcart.name}</td>
-                          </tr>`;
-          });
-      
-          // Append rows to table
-          $("#shopcart_search_results tbody").append(tableRows);
-      
-          if (filteredShopcarts.length > 0) {
-            flash_message("Shopcarts loaded successfully!");
-          } else {
-            flash_message("No shopcarts match the search criteria.",false);
-          }
+            $("#shopcart_search_results tbody").empty();
+
+            const filteredShopcarts = res.filter((shopcart) => {
+                let matchesID = shopcartID ? shopcart.id.toString() === shopcartID : true;
+                let matchesName = shopcartName ? shopcart.name.includes(shopcartName) : true;
+                return matchesID && matchesName;
+            });
+
+            let tableRows = "";
+            filteredShopcarts.forEach((shopcart) => {
+                tableRows += `<tr>
+                                <td>${shopcart.id}</td>
+                                <td>${shopcart.name}</td>
+                              </tr>`;
+            });
+
+            $("#shopcart_search_results tbody").append(tableRows);
+
+            if (filteredShopcarts.length > 0) {
+                flash_message("Shopcarts loaded successfully!");
+            } else {
+                flash_message("No shopcarts match the search criteria.", false);
+            }
         });
-      
+
         ajax.fail(function (res) {
-          flash_message(res.responseJSON.message,false);
+            flash_message(res.responseJSON.message, false);
         });
     });
 
     // ****************************************
-// Search Items
-// ****************************************
+    // Retrieve an Item
+    // ****************************************
 
-$("#search-item-btn").click(function () {
-    const shopcartID = $("#item_shopcart_id").val(); // Get Shopcart ID
-    const itemID = $("#item_id").val(); // Get Item ID
-    const quantity = $("#item_quantity").val(); 
-    const price = $("#item_price").val();
+    $("#retrieve-item-btn").click(function () {
+        const shopcartID = $("#item_shopcart_id").val(); // Get Shopcart ID
+        const itemID = $("#item_id").val(); // Get Item ID
 
-    // Clear previous flash messages
-    $("#flash_message").empty();
+        $("#flash_message").empty(); // Clear previous messages
 
-    // Validate the required field
-    if (!shopcartID) {
-        flash_message("Shopcart ID is required to search for items.",false);
-        return; // Stop execution if Shopcart ID is missing
-    }
+        // Validate that the Shopcart ID is populated
+        if (!shopcartID) {
+            flash_message("Shopcart ID is required to retrieve an item.", false);
+            return; // Stop execution
+        }
 
-    // Build the query string
-    let queryString = `shopcart_id=${shopcartID}`;
-    if (itemID) queryString += `&item_id=${itemID}`;
-    if (quantity) queryString += `&quantity=${quantity}`;
-    if (price) queryString += `&price=${price}`;
+        // Validate that the Item ID is populated
+        if (!itemID) {
+            flash_message("Item ID is required to retrieve an item.", false);
+            return; // Stop execution
+        }
 
-    // Make the AJAX call
-    let ajax = $.ajax({
-        type: "GET",
-        url: `shopcarts/${shopcartID}/items?${queryString}`,
-        contentType: "application/json",
-        data: ''
-    });
-
-    ajax.done(function (res) {
-        // Clear previous search results
-        $("#item_search_results tbody").empty();
-
-        // Build table rows for search results
-        let tableRows = "";
-        res.forEach((item) => {
-            tableRows += `<tr>
-                            <td>${item.item_id}</td>
-                            <td>${item.description}</td>
-                            <td>${item.quantity}</td>
-                            <td>${item.price}</td>
-                          </tr>`;
+        // Fetch all items for the given shopcart
+        let ajax = $.ajax({
+            type: "GET",
+            url: `/shopcarts/${shopcartID}/items`,
+            contentType: "application/json",
+            data: ''
         });
 
-        // Append rows to the table
-        $("#item_search_results tbody").append(tableRows);
+        ajax.done(function (res) {
+            // Find the first matching item
+            const matchingItem = res.find(item => item.item_id == itemID);
 
-        // Flash success message
-        flash_message("Items loaded successfully!");
+            if (matchingItem) {
+                // Populate the form with the retrieved item details
+                $("#item_id").val(matchingItem.item_id);
+                $("#item_description").val(matchingItem.description);
+                $("#item_quantity").val(matchingItem.quantity);
+                $("#item_price").val(matchingItem.price);
+
+                // Flash a success message
+                flash_message("Item retrieved successfully!", true);
+            } else {
+                // Flash a failure message if no match is found
+                flash_message("No matching item found in the shopcart.", false);
+            }
+        });
+
+        ajax.fail(function (res) {
+            // Flash an error message
+            flash_message(res.responseJSON.message, false);
+        });
     });
 
-    ajax.fail(function (res) {
-        // Flash error message on failure
-        flash_message(res.responseJSON.message,false);
+
+
+    // ****************************************
+    // Search Items
+    // ****************************************
+
+    $("#search-item-btn").click(function () {
+        const shopcartID = $("#item_shopcart_id").val();
+        const itemID = $("#item_id").val();
+        const quantity = $("#item_quantity").val();
+        const price = $("#item_price").val();
+
+        $("#flash_message").empty();
+
+        if (!shopcartID) {
+            flash_message("Shopcart ID is required to search for items.", false);
+            return;
+        }
+
+        let queryString = `shopcart_id=${shopcartID}`;
+        if (itemID) queryString += `&item_id=${itemID}`;
+        if (quantity) queryString += `&quantity=${quantity}`;
+        if (price) queryString += `&price=${price}`;
+
+        let ajax = $.ajax({
+            type: "GET",
+            url: `shopcarts/${shopcartID}/items?${queryString}`,
+            contentType: "application/json",
+            data: ''
+        });
+
+        ajax.done(function (res) {
+            $("#item_search_results tbody").empty();
+
+            let tableRows = "";
+            res.forEach((item) => {
+                tableRows += `<tr>
+                                <td>${item.item_id}</td>
+                                <td>${item.description}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.price}</td>
+                              </tr>`;
+            });
+
+            $("#item_search_results tbody").append(tableRows);
+
+            flash_message("Items loaded successfully!");
+        });
+
+        ajax.fail(function (res) {
+            flash_message(res.responseJSON.message, false);
+        });
     });
-});
+
+
+
 
 });
