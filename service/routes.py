@@ -28,6 +28,15 @@ from service.common import status  # HTTP Status Codes
 
 
 ######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route("/health")
+def health_check():
+    """Let them know our heart is still beating"""
+    return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
+
+
+######################################################################
 # GET INDEX
 ######################################################################
 @app.route("/")
@@ -384,45 +393,45 @@ def clear_shopcart_action(shopcart_id):
 ######################################################################
 # CALCULATE TOTAL PRICE OF SELECTED PRODUCTS
 ######################################################################
-@app.route("/shopcarts/<int:shopcart_id>/calculate_total_price", methods=["POST"])
-def calculate_selected_price(shopcart_id):
-    """
-    Calculate total price of selected items in a Shopcart
-    This endpoint will calculate the total price of all items marked as selected in the specified shopcart
-    """
-    app.logger.info(
-        "Request to calculate total price for selected items in Shopcart %s",
-        shopcart_id,
-    )
+# @app.route("/shopcarts/<int:shopcart_id>/calculate_total_price", methods=["POST"])
+# def calculate_selected_price(shopcart_id):
+#     """
+#     Calculate total price of selected items in a Shopcart
+#     This endpoint will calculate the total price of all items marked as selected in the specified shopcart
+#     """
+#     app.logger.info(
+#         "Request to calculate total price for selected items in Shopcart %s",
+#         shopcart_id,
+#     )
 
-    # Get item.id list
-    data = request.get_json()
-    selected_item_ids = data.get("selected_items", [])
+#     # Get item.id list
+#     data = request.get_json()
+#     selected_item_ids = data.get("selected_items", [])
 
-    # Find the shopcart by id
-    total_price = Shopcart.calculate_selected_items_price(
-        shopcart_id, selected_item_ids
-    )
-    app.logger.info(
-        "Total price for selected items in Shopcart %s is %s", shopcart_id, total_price
-    )
-    return jsonify(total_price=total_price), status.HTTP_200_OK
+#     # Find the shopcart by id
+#     total_price = Shopcart.calculate_selected_items_price(
+#         shopcart_id, selected_item_ids
+#     )
+#     app.logger.info(
+#         "Total price for selected items in Shopcart %s is %s", shopcart_id, total_price
+#     )
+#     return jsonify(total_price=total_price), status.HTTP_200_OK
 
 
-@app.route("/shopcarts/<int:shopcart_id>/calculate_total_price", methods=["GET"])
-def calculate_total_price(shopcart_id):
-    """
-    Calculate total price of selected items in a Shopcart
-    This endpoint will calculate the total price of all items marked as selected in the specified shopcart
-    """
-    app.logger.info(
-        "Request to calculate total price for selected items in Shopcart %s",
-        shopcart_id,
-    )
+# @app.route("/shopcarts/<int:shopcart_id>/calculate_total_price", methods=["GET"])
+# def calculate_total_price(shopcart_id):
+#     """
+#     Calculate total price of selected items in a Shopcart
+#     This endpoint will calculate the total price of all items marked as selected in the specified shopcart
+#     """
+#     app.logger.info(
+#         "Request to calculate total price for selected items in Shopcart %s",
+#         shopcart_id,
+#     )
 
-    # Find the shopcart by id
-    total_price = Shopcart.calculate_total_price(shopcart_id)
-    app.logger.info(
-        "Total price for selected items in Shopcart %s is %d", shopcart_id, total_price
-    )
-    return jsonify(total_price=total_price), status.HTTP_200_OK
+#     # Find the shopcart by id
+#     total_price = Shopcart.calculate_total_price(shopcart_id)
+#     app.logger.info(
+#         "Total price for selected items in Shopcart %s is %d", shopcart_id, total_price
+#     )
+#     return jsonify(total_price=total_price), status.HTTP_200_OK
