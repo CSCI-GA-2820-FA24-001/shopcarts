@@ -221,6 +221,8 @@ $(function () {
 $("#search-item-btn").click(function () {
     const shopcartID = $("#item_shopcart_id").val(); // Get Shopcart ID
     const itemID = $("#item_id").val(); // Get Item ID
+    const quantity = $("#item_quantity").val(); 
+    const price = $("#item_price").val();
 
     // Clear previous flash messages
     $("#flash_message").empty();
@@ -234,11 +236,13 @@ $("#search-item-btn").click(function () {
     // Build the query string
     let queryString = `shopcart_id=${shopcartID}`;
     if (itemID) queryString += `&item_id=${itemID}`;
+    if (quantity) queryString += `&quantity=${quantity}`;
+    if (price) queryString += `&price=${price}`;
 
     // Make the AJAX call
     let ajax = $.ajax({
         type: "GET",
-        url: `/items?${queryString}`,
+        url: `shopcarts/${shopcartID}/items?${queryString}`,
         contentType: "application/json",
         data: ''
     });
