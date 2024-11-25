@@ -34,44 +34,7 @@ from service.common import status  # HTTP Status Codes
 def index():
     """Root URL response"""
     app.logger.info("Request for Root URL")
-    return (
-        jsonify(
-            name="Shopcarts REST API Service",
-            version="1.0",
-            paths={
-                "create_shopcarts": url_for("create_shopcarts", _external=True),
-                "read_shopcarts": url_for(
-                    "get_shopcarts", shopcart_id=1, _external=True
-                ),
-                "update_shopcarts": url_for(
-                    "update_shopcarts", shopcart_id=1, _external=True
-                ),
-                "delete_shopcarts": url_for(
-                    "delete_shopcarts", shopcart_id=1, _external=True
-                ),
-                "list_shopcarts": url_for("list_shopcarts", _external=True),
-                "create_shopcart_items": url_for(
-                    "create_items", shopcart_id=1, _external=True
-                ),
-                "read_shopcart_items": url_for(
-                    "get_items", shopcart_id=1, item_id=1, _external=True
-                ),
-                "update_shopcart_items": url_for(
-                    "update_items", shopcart_id=1, item_id=1, _external=True
-                ),
-                "delete_shopcart_items": url_for(
-                    "delete_item_from_shopcart",
-                    shopcart_id=1,
-                    item_id=1,
-                    _external=True,
-                ),
-                "list_shopcart_items": url_for(
-                    "list_items_in_shopcart", shopcart_id=1, _external=True
-                ),
-            },
-        ),
-        status.HTTP_200_OK,
-    )
+    return app.send_static_file("index.html")
 
 
 ######################################################################
