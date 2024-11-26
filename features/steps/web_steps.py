@@ -33,12 +33,10 @@ from selenium.webdriver.support import expected_conditions
 ID_PREFIX = "item_"
 
 
-@when('I visit the "Shopcart Page"')
+@when('I visit the "Home Page"')
 def step_impl(context):
     """Make a call to the base URL"""
     context.driver.get(context.base_url)
-    # Uncomment next line to take a screenshot of the web page
-    # context.driver.save_screenshot('home_page.png')
 
 
 @then('I should see "{message}" in the title')
