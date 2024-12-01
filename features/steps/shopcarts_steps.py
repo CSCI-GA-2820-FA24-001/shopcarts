@@ -57,3 +57,44 @@ def step_impl(context):
         }
         context.resp = requests.post(rest_endpoint, json=payload, timeout=WAIT_TIMEOUT)
         expect(context.resp.status_code).equal_to(HTTP_201_CREATED)
+
+
+@given("the following items")
+def step_impl(context):
+    """Load new items"""
+
+    # Get a list all of the shopcarts
+    rest_endpoint = f"{context.base_url}/shopcarts"
+    context.resp = requests.get(rest_endpoint, timeout=WAIT_TIMEOUT)
+    expect(context.resp.status_code).equal_to(HTTP_200_OK)
+    # and delete all shopcart items in the shopcarts one by one
+    shopcart_ids = []
+    for shopcart in context.resp.json():
+        context.resp = requests.put(
+            f"{rest_endpoint}/{shopcart['id']}/clear", timeout=WAIT_TIMEOUT
+        )
+        expect(context.resp.status_code).equal_to(HTTP_200_OK)
+        shopcart_ids.append(shopcart["id"])
+
+    # load the database
+    idx = 0
+    cnt = 0
+
+    for row in context.table:
+        shopcart_id = shopcart_ids[idx]
+        payload = {
+            "shopcart_id": shopcart_id,
+            "item_id": row["item_id"],
+            "description": row["description"],
+            "quantity": int(row["quantity"]),
+            "price": int(row["price"]),
+        }
+        context.resp = requests.post(
+            f"{rest_endpoint}/{shopcart_id}/items", json=payload, timeout=WAIT_TIMEOUT
+        )
+
+        cnt += 1
+        if cnt == 3:
+            idx += 1
+
+        expect(context.resp.status_code).equal_to(HTTP_201_CREATED)

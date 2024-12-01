@@ -78,29 +78,3 @@ class Shopcart(db.Model, PersistentBase):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
-
-    # @classmethod
-    # def calculate_total_price(cls, id: int):
-    #     """_summary_
-
-    #     Args:
-    #         id (_type_): _description_
-
-    #     Returns:
-    #         _type_: _description_
-    #     """
-    #     shopcart = cls.find(id)
-    #     total_price = sum(item.quantity * item.price for item in shopcart.items)
-    #     return total_price
-
-    # @classmethod
-    # def calculate_selected_items_price(
-    #     cls, id: int, selected_item_ids: list[int]
-    # ) -> int:
-    #     shopcart = cls.find(id)
-    #     total_price = sum(
-    #         item.quantity * item.price
-    #         for item in shopcart.items
-    #         if int(item.item_id) in selected_item_ids
-    #     )
-    #     return total_price
