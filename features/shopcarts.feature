@@ -87,19 +87,24 @@ Scenario: Query Shopcart by Name
 ######################################################################
 
 Scenario: Create and Read Item
+
+    # Take shopcart id to item table
     When I visit the "Home Page"
     And I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
     When I copy the "shopcart_id" field
     And I paste the "shopcart_id_item" field
-    Then I should see the message "Success"
+    And I press the "search-item" button
+    Then I should see the flash message "Success" for item
+
+    # Create a new item
     When I set the "item_name" to "pills"
     And I set the "item_description" to "to take"
     And I set the "item_quantity" to "50"
     And I set the "item_price" to "1"
     And I press the "Create Item" button
-    Then I should see the message "Success"
+    Then I should see the flash message "Success" for item
 
     # Read to Verify
     When I leave the "item_name" field empty
@@ -111,21 +116,28 @@ Scenario: Create and Read Item
     And I should see "to take" in the "item_description" field
     And I should see "50" in the "item_quantity" field
     And I should see "1" in the "item_price" field
+    When I press the "search-item" button
+    Then I should see "pills" in the item results
 
 Scenario: Update an Item
+
+    # Take shopcart id to item table
     When I visit the "Home Page"
     And I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
     When I copy the "shopcart_id" field
     And I paste the "shopcart_id_item" field
-    Then I should see the message "Success"
+    And I press the "search-item" button
+    Then I should see the flash message "Success" for item
+
+    # Update an existing item
     When I set the "item_name" to "pistol"
     And I set the "item_description" to "to shoot"
     And I set the "item_quantity" to "1"
     And I set the "item_price" to "5000"
     And I press the "Create Item" button
-    Then I should see the message "Success"
+    Then I should see the flash message "Success" for item
 
     # Read to Verify
     When I leave the "item_name" field empty
@@ -137,6 +149,8 @@ Scenario: Update an Item
     And I should see "to shoot" in the "item_description" field
     And I should see "1" in the "item_quantity" field
     And I should see "5000" in the "item_price" field
+    When I press the "search-item" button
+    Then I should see "pistol" in the item results
 
 Scenario: Delete an Item
     When I visit the "Home Page"
@@ -145,12 +159,17 @@ Scenario: Delete an Item
     Then I should see the message "Success"
     When I copy the "shopcart_id" field
     And I paste the "shopcart_id_item" field
-    Then I should see the message "Success"
+    And I press the "search-item" button
+    Then I should see the flash message "Success" for item
 
     When I press the "Delete Item" button
-    And I paste the "shopcart_id_item" field
-    # Then I should see the flash message "Success" for item
+    Then I should see the flash message "Item has been Deleted!" for item
+    When I paste the "shopcart_id_item" field
+    And I press the "search-item" button
+    Then I should see the flash message "Success" for item
     And I should not see "knife" in the item results
+    And I should see "rope" in the item results
+    And I should see "charcoal" in the item results
 
 Scenario: List Items
     When I visit the "Home Page"
@@ -160,6 +179,71 @@ Scenario: List Items
 
     When I copy the "shopcart_id" field
     And I paste the "shopcart_id_item" field
-    And I press the "Search" button
+    And I press the "search-item" button
     Then I should see the flash message "Success" for item
     And I should see "knife" in the item results
+    And I should see "rope" in the item results
+    And I should see "charcoal" in the item results
+
+Scenario: Clear Items Action for a shopcart
+
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+
+    When I copy the "shopcart_id" field
+    And I paste the "shopcart_id_item" field
+    And I press the "search-item" button
+    Then I should see the flash message "Success" for item
+    And I should see "knife" in the item results
+    And I should see "rope" in the item results
+    And I should see "charcoal" in the item results
+
+    When I press the "cancel" button
+    Then I should see the message "Success"
+
+    When I press the "clear-item" button
+    And I paste the "shopcart_id_item" field
+    And I press the "search-item" button
+    Then I should see the flash message "Success" for item
+    And I should not see "knife" in the item results
+    And I should not see "rope" in the item results
+    And I should not see "charcoal" in the item results
+
+Scenario: Query item by Name
+
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+
+    When I copy the "shopcart_id" field
+    And I paste the "shopcart_id_item" field
+    And I press the "search-item" button
+    Then I should see the flash message "Success" for item
+    And I should see "knife" in the item results
+    And I should see "rope" in the item results
+    And I should see "charcoal" in the item results
+
+    # Filtering by Quantity
+    When I press the "clear-item" button
+    And I copy the "shopcart_id" field
+    And I paste the "shopcart_id_item" field
+    And I set the "item_quantity" to "1"
+    And I press the "search-item" button
+    Then I should see the message "Success"
+    And I should see "knife" in the item results
+    And I should not see "rope" in the item results
+    And I should not see "charcoal" in the item results
+
+    # Filtering by Price
+    When I press the "clear-item" button
+    And I copy the "shopcart_id" field
+    And I paste the "shopcart_id_item" field
+    And I set the "item_price" to "5"
+    And I press the "search-item" button
+    Then I should see the message "Success"
+    And I should not see "knife" in the item results
+    And I should see "rope" in the item results
+    And I should not see "charcoal" in the item results
