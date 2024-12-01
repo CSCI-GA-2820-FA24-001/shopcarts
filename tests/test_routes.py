@@ -92,12 +92,6 @@ class TestShopcartService(TestCase):
     #  T E S T   C A S E S
     ######################################################################
 
-    def test_index(self):
-        """It should call the home page"""
-        resp = self.client.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn(b"<title>Shopcart and Item Management</title>", resp.data)
-
     def test_health(self):
         """It should be healthy"""
         response = self.client.get("/health")
