@@ -207,34 +207,38 @@ class TestShopcart(TestCase):
         item = Item()
         self.assertRaises(DataValidationError, item.deserialize, [])
 
-    # def test_total_price(self):
-    #     """It should test total price"""
-    #     shopcart = ShopcartFactory()
-    #     item1 = ItemFactory()
-    #     shopcart.items.append(item1)
-    #     item2 = ItemFactory()
-    #     shopcart.items.append(item2)
-    #     item3 = ItemFactory()
-    #     shopcart.items.append(item3)
-    #     shopcart.create()
-    #     test_total_price = item1.price + item2.price + item3.price
+    def test_total_price(self):
+        """It should test total price"""
+        shopcart = ShopcartFactory()
+        item1 = ItemFactory()
+        shopcart.items.append(item1)
+        item2 = ItemFactory()
+        shopcart.items.append(item2)
+        item3 = ItemFactory()
+        shopcart.items.append(item3)
+        shopcart.create()
+        test_total_price = (
+            item1.price * item1.quantity
+            + item2.price * item2.quantity
+            + item3.price * item3.quantity
+        )
 
-    #     total_price = Shopcart.calculate_total_price(shopcart.id)
-    #     self.assertEqual(total_price, test_total_price)
+        total_price = Shopcart.calculate_total_price(shopcart.id)
+        self.assertEqual(total_price, test_total_price)
 
-    # def test_total_price_selected(self):
-    #     """It should total price selected"""
-    #     shopcart = ShopcartFactory()
-    #     item1 = ItemFactory()
-    #     shopcart.items.append(item1)
-    #     item2 = ItemFactory()
-    #     shopcart.items.append(item2)
-    #     item3 = ItemFactory()
-    #     shopcart.items.append(item3)
-    #     shopcart.create()
-    #     test_total_price = item1.price + item3.price
+    def test_total_price_selected(self):
+        """It should total price selected"""
+        shopcart = ShopcartFactory()
+        item1 = ItemFactory()
+        shopcart.items.append(item1)
+        item2 = ItemFactory()
+        shopcart.items.append(item2)
+        item3 = ItemFactory()
+        shopcart.items.append(item3)
+        shopcart.create()
+        test_total_price = item1.price * item1.quantity + item3.price * item3.quantity
 
-    #     total_price = Shopcart.calculate_selected_items_price(
-    #         shopcart.id, [int(item1.item_id), int(item3.item_id)]
-    #     )
-    #     self.assertEqual(total_price, test_total_price)
+        total_price = Shopcart.calculate_selected_items_price(
+            shopcart.id, [int(item1.item_id), int(item3.item_id)]
+        )
+        self.assertEqual(total_price, test_total_price)
