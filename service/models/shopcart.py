@@ -79,8 +79,6 @@ class Shopcart(db.Model, PersistentBase):
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
 
-   
-
     @classmethod
     def calculate_selected_items_price(
         cls, id: int, selected_item_ids: list[int]
