@@ -104,4 +104,3 @@ class Shopcart(db.Model, PersistentBase):
         shopcart = cls.find(id)
         total_price = sum(item.quantity * item.price for item in shopcart.items)
         return total_price
-
