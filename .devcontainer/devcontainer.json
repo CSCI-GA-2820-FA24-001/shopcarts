@@ -15,7 +15,10 @@
 					"tekton",
 					"creds",
 					"virtualenvs",
-					"shopcarts"
+					"shopcarts",
+					"shopcart",
+					"Shopcarts",
+					"Shopcart"
 				],
 				"[python]": {
 					"editor.defaultFormatter": "ms-python.black-formatter",

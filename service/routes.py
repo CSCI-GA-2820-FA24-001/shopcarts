@@ -387,8 +387,6 @@ def clear_shopcart_action(shopcart_id):
 
     shopcart.update()
 
-    return jsonify(shopcart.serialize()), status.HTTP_200_OK
-
 
 ######################################################################
 # CALCULATE TOTAL PRICE OF SELECTED PRODUCTS
@@ -434,4 +432,4 @@ def calculate_total_price(shopcart_id):
     app.logger.info(
         "Total price for selected items in Shopcart %s is %d", shopcart_id, total_price
     )
-    return jsonify(total_price=total_price), status.HTTP_200_OK
+    return jsonify(total_price=total_price), status.HTTP_200_O
