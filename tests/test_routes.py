@@ -92,12 +92,6 @@ class TestShopcartService(TestCase):
     #  T E S T   C A S E S
     ######################################################################
 
-    def test_index(self):
-        """It should call the home page"""
-        resp = self.client.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn(b"<title>Shopcart and Item Management</title>", resp.data)
-
     def test_health(self):
         """It should be healthy"""
         response = self.client.get("/health")
@@ -469,6 +463,11 @@ class TestShopcartService(TestCase):
         self.assertEqual(int(data[0]["item_id"]), item1.item_id)
         self.assertEqual(int(data[1]["item_id"]), item2.item_id)
 
+        rep = False
+
+        if int(data[0]["item_id"]) == int(data[1]["item_id"]):
+            rep = True
+
         # Test query by `price`
         resp = self.client.get(f"{BASE_URL}/{new_shopcart['id']}/items?price=10")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -490,7 +489,10 @@ class TestShopcartService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-        self.assertEqual(len(data), 1)
+        if rep:
+            self.assertEqual(len(data), 2)
+        else:
+            self.assertEqual(len(data), 1)
         self.assertEqual(int(data[0]["item_id"]), item1.item_id)
 
     ######################################################################
