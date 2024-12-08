@@ -28,19 +28,9 @@ spec:
                 secretKeyRef:
                   name: postgres-creds
                   key: password
-            - name: POSTGRES_USER
-              valueFrom:
-                  configMapKeyRef:
-                    name: postgres-config
-                    key: postgres_user
-            - name: POSTGRES_DB
-              valueFrom:
-                  configMapKeyRef:
-                    name: postgres-config
-                    key: postgres_db
           volumeMounts:
           - name: postgres-storage
-            mountPath: /var/lib/postgresql
+            mountPath: /var/lib/postgresql/data
           resources:
             limits:
               cpu: "0.50"

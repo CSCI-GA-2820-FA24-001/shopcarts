@@ -81,17 +81,9 @@ class Shopcart(db.Model, PersistentBase):
 
     @classmethod
     def calculate_selected_items_price(
-        cls, shopcart_id: int, selected_item_ids: list[int]
+        cls, id: int, selected_item_ids: list[int]
     ) -> int:
-        """_summary_
-
-        Args:
-            id (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
-        shopcart = cls.find(shopcart_id)
+        shopcart = cls.find(id)
         total_price = sum(
             item.quantity * item.price
             for item in shopcart.items
@@ -100,7 +92,7 @@ class Shopcart(db.Model, PersistentBase):
         return total_price
 
     @classmethod
-    def calculate_total_price(cls, shopcart_id: int):
+    def calculate_total_price(cls, id: int):
         """_summary_
 
         Args:
@@ -109,6 +101,6 @@ class Shopcart(db.Model, PersistentBase):
         Returns:
             _type_: _description_
         """
-        shopcart = cls.find(shopcart_id)
+        shopcart = cls.find(id)
         total_price = sum(item.quantity * item.price for item in shopcart.items)
         return total_price

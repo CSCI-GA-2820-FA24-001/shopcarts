@@ -89,15 +89,15 @@ class Item(db.Model, PersistentBase):
 
         return self
 
-    # @classmethod
-    # def find_by_id(cls, id):
-    #     """Returns all items with the given id
+    @classmethod
+    def find_by_id(cls, id):
+        """Returns all items with the given id
 
-    #     Args:
-    #         id (integer): the name of the Accounts you want to match
-    #     """
-    #     logger.info("Processing id query for %s ...", id)
-    #     return cls.query.filter(cls.id == id)
+        Args:
+            id (integer): the name of the Accounts you want to match
+        """
+        logger.info("Processing id query for %s ...", id)
+        return cls.query.filter(cls.id == id)
 
     @classmethod
     def find_by_price(cls, price):
