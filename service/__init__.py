@@ -20,8 +20,12 @@ and SQL database
 """
 import sys
 from flask import Flask
+from flask_restx import Api
 from service import config
 from service.common import log_handlers
+
+# Will be initialize when app is created
+api = None  # pylint: disable=invalid-name
 
 
 ############################################################
@@ -33,10 +37,29 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(config)
 
+    # Turn off strict slashes because it violates best practices
+    app.url_map.strict_slashes = False
+
     # Initialize Plugins
     # pylint: disable=import-outside-toplevel
     from service.models import db
+
     db.init_app(app)
+
+    ######################################################################
+    # Configure Swagger before initializing it
+    ######################################################################
+    global api
+    api = Api(
+        app,
+        version="1.0.0",
+        title="Shopcarts RESTX API Service",
+        description="This is a Shopcarts server.",
+        default="shopcarts",
+        default_label="Shopcarts operations",
+        doc="/apidocs",
+        prefix="/api",
+    )
 
     with app.app_context():
         # Dependencies require we import the routes AFTER the Flask app is created
