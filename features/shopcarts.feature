@@ -60,9 +60,8 @@ Scenario: Delete a Shopcart
     Then I should see the message "Success"
     When I press the "Delete" button
     Then I should see the message "Deleted Shopcart!"
-    When I press the "Clear" button
-    And I press the "Retrieve" button
-    Then I should see the message "404 Not Found"
+    When I press the "Retrieve" button
+    Then I should see the message "not found"
 
 Scenario: List Shopcarts
     When I visit the "Home Page"
