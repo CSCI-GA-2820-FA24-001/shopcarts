@@ -607,7 +607,7 @@ class TestShopcartService(TestCase):
         self.assertEqual(data["total_price"], expected_total_price)
 
     def test_calculate_total_price(self):
-        """It should calculate the total price of selected items in a shopcart"""
+        """It should calculate the total price of items in a shopcart"""
 
         # Create a shopcart
         shopcart = self._create_shopcarts(1)[0]
