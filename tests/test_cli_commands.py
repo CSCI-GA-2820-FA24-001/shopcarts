@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 ######################################################################
 # Copyright 2016, 2024 John J. Rofrano. All Rights Reserved.
 #
