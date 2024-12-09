@@ -22,7 +22,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: shopcarts
-        image: cluster-registry:5000/nyu-devops/shopcarts:1.0.0
+        image: cluster-registry:5000/nyu-devops/shopcarts:latest
         # image: shopcarts
         imagePullPolicy: IfNotPresent
         ports:
