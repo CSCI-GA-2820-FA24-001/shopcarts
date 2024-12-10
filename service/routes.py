@@ -486,19 +486,19 @@ class ItemCollection(Resource):
 
         # Get the query parameters
         args = item_args.parse_args()
+        item_id = args.get("item_id")
+        quantity = args.get("quantity")
+        price = args.get("price")
 
-        if args["item_id"]:
-            app.logger.info("Filtering by item_id: %s", args["item_id"])
-            items = Item.find_by_item_id(args["item_id"])
-        elif args["quantity"]:
-            app.logger.info("Filtering by quantity: %s", args["quantity"])
-            items = Item.find_by_quantity(args["quantity"])
-        elif args["price"] is not None:
-            app.logger.info("Filtering by price: %s", args["price"])
-            items = Item.find_by_price(args["price"])
-        else:
-            app.logger.info("Returning unfiltered list.")
-            items = Item.all()
+        if item_id:
+            app.logger.info("Filtering by item_id: %s", item_id)
+            items = [item for item in items if item.item_id == item_id]
+        if quantity:
+            app.logger.info("Filtering by quantity: %s", quantity)
+            items = [item for item in items if item.quantity == quantity]
+        if price:
+            app.logger.info("Filtering by price: %s", price)
+            items = [item for item in items if item.price == price]
 
         result = [item.serialize() for item in items]
 
