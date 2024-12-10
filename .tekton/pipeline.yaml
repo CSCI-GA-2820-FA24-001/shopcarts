@@ -147,3 +147,16 @@ spec:
       workspaces:
         - name: source
           workspace: pipeline-workspace
+    # - name: behave
+    #   params:
+    #     - name: base-url
+    #       value: $(params.BASE_URL)
+    #   runAfter:
+    #     - deploy-image
+    #   taskRef:
+    #     kind: Task
+    #     name: behave
+    #   workspaces:
+    #     - name: source
+    #       workspace: pipeline-workspace
+
