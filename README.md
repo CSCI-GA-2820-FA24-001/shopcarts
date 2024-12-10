@@ -83,8 +83,6 @@ Here’s a list of available API endpoints with their descriptions:
 |-------------|-----------------------------------------------|-----------------------------------------------------|
 | PUT         | /shopcarts/{shopcart_id}/clear                                  | Clear the shopcart                  |
 
-
-
 ## Running Tests
 
 To run the tests, use the following command:
@@ -102,6 +100,16 @@ To check your code for style and linting issues, use the following command:
 ```bash
 make lint
 ```
+
+## Running Server
+
+To run the tests, use the following command:
+
+```bash
+make run
+```
+
+This will run all the test cases located in the `tests` folder, including unit tests for models and API route tests, using `pytest`. This will have a force term of at least 95% coverage.
 
 This will run `flake8` and other configured linters to ensure your code follows Python style guidelines and best practices.
 
