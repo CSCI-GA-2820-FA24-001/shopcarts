@@ -20,6 +20,7 @@ DATABASE_URI = os.getenv(
 ######################################################################
 
 
+# pylint: disable=too-many-public-methods
 class TestShopcart(TestCase):
     """Shopcart Model Test Cases"""
 

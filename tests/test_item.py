@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """
 Test cases for Item Model
 """

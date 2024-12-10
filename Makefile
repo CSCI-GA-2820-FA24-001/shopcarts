@@ -78,10 +78,15 @@ push: ## Push to a Docker image registry
 .PHONY: postgres
 postgres: ## Deploy the PostgreSQL service on local Kubernetes
 	$(info Deploying PostgreSQL service to Kubernetes...)
-	kubectl apply -f k8s/postgres
+	kubectl apply -f k8s/postgresql
+
+# .PHONY: deploy
+# deploy: postgres ## Deploy the service on local Kubernetes
+# 	$(info Deploying service locally...)
+# 	kubectl apply -f k8s/
 
 .PHONY: deploy
-deploy: postgres ## Deploy the service on local Kubernetes
+deploy: ## Deploy the service on local Kubernetes
 	$(info Deploying service locally...)
 	kubectl apply -f k8s/
 
