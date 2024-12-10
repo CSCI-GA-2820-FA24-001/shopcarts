@@ -111,6 +111,8 @@ To check your code server function in local, use the following command:
 make run
 ```
 
+This will run `honcho start`.
+
 ## Running Local K8s
 
 To check your local cluster function well in local, use the following command:
@@ -121,8 +123,6 @@ make build
 make push
 make deploy
 ```
-
-This will run `honcho start`.
 
 ## License
 
