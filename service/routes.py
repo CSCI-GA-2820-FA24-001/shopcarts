@@ -487,16 +487,6 @@ class ItemCollection(Resource):
         # Get the query parameters
         args = item_args.parse_args()
 
-        # if item_id:
-        #     app.logger.info("Filter by item_id: %s", item_id)
-        #     items = [item for item in items if str(item.item_id) == item_id]
-        # if quantity:
-        #     app.logger.info("Filter by quantity: %s", quantity)
-        #     items = [item for item in items if str(item.quantity) == quantity]
-        # if price:
-        #     app.logger.info("Filter by price: %s", price)
-        #     items = [item for item in items if str(item.price) == price]
-
         if args["item_id"]:
             app.logger.info("Filtering by item_id: %s", args["item_id"])
             items = Item.find_by_item_id(args["item_id"])
