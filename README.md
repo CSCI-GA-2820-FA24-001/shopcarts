@@ -103,7 +103,15 @@ To check your code for style and linting issues, use the following command:
 make lint
 ```
 
-This will run `flake8` and other configured linters to ensure your code follows Python style guidelines and best practices.
+## Running Locally
+
+To check your code server function in local, use the following command:
+
+```bash
+make run
+```
+
+This will run `honcho start`.
 
 ## License
 
