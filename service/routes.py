@@ -105,13 +105,6 @@ shopcart_args.add_argument(
 
 item_args = reqparse.RequestParser()
 item_args.add_argument(
-    "item_id",
-    type=str,
-    location="args",
-    required=False,
-    help="ID of the Item",
-)
-item_args.add_argument(
     "quantity",
     type=int,
     location="args",
@@ -486,13 +479,9 @@ class ItemCollection(Resource):
 
         # Get the query parameters
         args = item_args.parse_args()
-        item_id = args.get("item_id")
         quantity = args.get("quantity")
         price = args.get("price")
 
-        if item_id:
-            app.logger.info("Filtering by item_id: %s", item_id)
-            items = [item for item in items if item.item_id == item_id]
         if quantity:
             app.logger.info("Filtering by quantity: %s", quantity)
             items = [item for item in items if item.quantity == quantity]
@@ -558,28 +547,3 @@ def abort(error_code: int, message: str):
     """Logs errors before aborting"""
     app.logger.error(message)
     api.abort(error_code, message)
-
-
-# @app.route("/shopcarts/<int:shopcart_id>/calculate_total_price", methods=["POST"])
-# def calculate_selected_price(shopcart_id):
-#     """
-#     Calculate total price of selected items in a Shopcart
-#     This endpoint will calculate the total price of all items marked as selected in the specified shopcart
-#     """
-#     app.logger.info(
-#         "Request to calculate total price for selected items in Shopcart %s",
-#         shopcart_id,
-#     )
-
-#     # Get item.id list
-#     data = request.get_json()
-#     selected_item_ids = data.get("selected_items", [])
-
-#     # Find the shopcart by id
-#     total_price = Shopcart.calculate_selected_items_price(
-#         shopcart_id, selected_item_ids
-#     )
-#     app.logger.info(
-#         "Total price for selected items in Shopcart %s is %s", shopcart_id, total_price
-#     )
-#     return jsonify(total_price=total_price), status.HTTP_200_OK
