@@ -455,11 +455,6 @@ class TestShopcartService(TestCase):
         self.assertEqual(int(data[0]["item_id"]), item1.item_id)
         self.assertEqual(int(data[1]["item_id"]), item2.item_id)
 
-        rep = False
-
-        if int(data[0]["item_id"]) == int(data[1]["item_id"]):
-            rep = True
-
         # Test query by `price`
         resp = self.client.get(f"{BASE_URL}/{new_shopcart['id']}/items?price=10")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
