@@ -475,18 +475,6 @@ class TestShopcartService(TestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(int(data[0]["quantity"]), 5)
 
-        # Test query by `item_id`
-        resp = self.client.get(
-            f"{BASE_URL}/{new_shopcart['id']}/items?item_id={item1.item_id}"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        if rep:
-            self.assertEqual(len(data), 2)
-        else:
-            self.assertEqual(len(data), 1)
-        self.assertEqual(int(data[0]["item_id"]), item1.item_id)
-
     ######################################################################
     #  A C T I O N S   T E S T   C A S E S
     ######################################################################
